@@ -1,0 +1,38 @@
+
+.tables-form{
+  padding: 10px 8px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.tables-form-input{
+    display: flex;
+    justify-content: space-between;
+}
+
+.tables-input-child{
+    border: 1px solid rgb(219, 216, 216);
+    padding: 9px 7px;
+    border-radius: 5px;
+}
+
+.tables-form-btn{
+    text-align: end;
+    margin-right: 5px;
+}
+
+.formbutton{
+    padding: 8px 18px;
+    margin-top: 10px;
+    background-color:  #49a3f1;
+    color: white;
+    border-radius: 5px;
+    border: none;
+}
+
+.formbutton:hover{
+  color:#49a3f1 ;
+  background-color:white;
+  border: 1px solid #49a3f1;
+}
+

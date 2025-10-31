@@ -1,0 +1,61 @@
+.employee-table {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+.employee-table .align-middle{
+    width: 100%;
+}
+
+.employee-table th {
+  color: #9a9a9a;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.prof-img-name{
+    display: flex;
+    gap: 12px;
+}
+
+.prof-img-name .fw-bold{
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.prof-img-name .small{
+    font-size: 13px;
+}
+
+.func-small{
+    font-size: 13px;
+}
+
+.fw-semibold{
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.employee-table td {
+  vertical-align: middle;
+}
+
+.employee-table .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.employee-table .badge {
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+.employee-table .btn-link {
+  color: #007bff;
+  font-weight: 500;
+}
