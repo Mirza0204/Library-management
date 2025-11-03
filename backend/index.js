@@ -91,17 +91,21 @@ app.post("/books", (req, res) => {
 
 // -----------------------------------------------
 app.post("/librarybooks", (req, res) => {
-  const q = "INSERT INTO librarybooks (`title`, `description`, `price`, `cover`) VALUES (?)";
+  const q = "INSERT INTO books (`title`, `description`, `price`, `cover`) VALUES (?)";
   const values = [
     req.body.title,
     req.body.description,
     req.body.price,
-    req.body.cover
+    req.body.cover,
   ];
 
   db.query(q, [values], (err, data) => {
-    if (err) return res.json(err);
-    return res.json("Book added successfully!");
+    if (err) {
+      console.error("❌ SQL Insert Error:", err);
+      return res.status(500).json({ message: "Database Insert Failed", error: err });
+    }
+    console.log("✅ Book Added:", values);
+    return res.json({ success: true, data });
   });
 });
 // --------------------------------------------
