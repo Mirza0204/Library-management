@@ -91,7 +91,7 @@ app.post("/books", (req, res) => {
 
 // -----------------------------------------------
 app.post("/librarybooks", (req, res) => {
-  const q = "INSERT INTO books (`title`, `description`, `price`, `cover`) VALUES (?)";
+  const q = "INSERT INTO librarybooks (`title`, `description`, `price`, `cover`) VALUES (?)";
   const values = [
     req.body.title,
     req.body.description,
@@ -111,7 +111,7 @@ app.post("/librarybooks", (req, res) => {
 // --------------------------------------------
 
 app.get("/librarybooks", (req, res) => {
-    const q = "SELECT * FROM books"
+    const q = "SELECT * FROM librarybooks"
     db.query(q, (err, data) => {
         if (err) return res.json(err)
         return res.json(data)
