@@ -70,53 +70,23 @@ app.post("/books", (req, res) => {
 
 
 app.post("/books", (req, res) => {
-  const q = "INSERT INTO books (`title`, `description`, `price`, `cover`) VALUES (?)";
-  const values = [
-    req.body.title,
-    req.body.description,
-    req.body.price,
-    req.body.cover,
-  ];
+    const q = "INSERT INTO books (`title`, `description`, `price`, `cover`) VALUES (?)";
+    const values = [
+        req.body.title,
+        req.body.description,
+        req.body.price,
+        req.body.cover,
+    ];
 
-  db.query(q, [values], (err, data) => {
-    if (err) {
-      console.error("❌ SQL Insert Error:", err);
-      return res.status(500).json({ message: "Database Insert Failed", error: err });
-    }
-    console.log("✅ Book Added:", values);
-    return res.json({ success: true, data });
-  });
+    db.query(q, [values], (err, data) => {
+        if (err) {
+            console.error("❌ SQL Insert Error:", err);
+            return res.status(500).json({ message: "Database Insert Failed", error: err });
+        }
+        console.log("✅ Book Added:", values);
+        return res.json({ success: true, data });
+    });
 });
-
-
-// -----------------------------------------------
-app.post("/librarybooks", (req, res) => {
-  const q = "INSERT INTO librarybooks (`title`, `description`, `price`, `cover`) VALUES (?)";
-  const values = [
-    req.body.title,
-    req.body.description,
-    req.body.price,
-    req.body.cover,
-  ];
-
-  db.query(q, [values], (err, data) => {
-    if (err) {
-      console.error("❌ SQL Insert Error:", err);
-      return res.status(500).json({ message: "Database Insert Failed", error: err });
-    }
-    console.log("✅ Book Added:", values);
-    return res.json({ success: true, data });
-  });
-});
-// --------------------------------------------
-
-app.get("/librarybooks", (req, res) => {
-    const q = "SELECT * FROM librarybooks"
-    db.query(q, (err, data) => {
-        if (err) return res.json(err)
-        return res.json(data)
-    })
-})
 
 
 //--------------- Delete condition ---------------
@@ -154,6 +124,79 @@ app.put("/books/:id", (req, res) => {
     })
 })
 //--------------- Update condition ---------------
+
+// ------------------------------------------------------------------------
+// ----------------------------librarybooks--------------------------------
+// -----------------------------------------------
+app.post("/librarybooks", (req, res) => {
+    const q = "INSERT INTO librarybooks (`title`, `description`, `price`, `cover`) VALUES (?)";
+    const values = [
+        req.body.title,
+        req.body.description,
+        req.body.price,
+        req.body.cover,
+    ];
+
+    db.query(q, [values], (err, data) => {
+        if (err) {
+            console.error("❌ SQL Insert Error:", err);
+            return res.status(500).json({ message: "Database Insert Failed", error: err });
+        }
+        console.log("✅ Book Added:", values);
+        return res.json({ success: true, data });
+    });
+});
+// --------------------------------------------
+
+app.get("/librarybooks", (req, res) => {
+    const q = "SELECT * FROM librarybooks"
+    db.query(q, (err, data) => {
+        if (err) return res.json(err)
+        return res.json(data)
+    })
+})
+
+//--------------- Update condition ---------------
+app.put("/librarybooks/:id", (req, res) => {
+    // this params represent /books
+    const bookId = req.params.id;
+    // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
+    const q = "UPDATE librarybooks SET `title`=?, `description`=?, `price`=?, `cover`=? WHERE id=?"
+
+
+    const values = [
+        req.body.title,
+        req.body.description,
+        req.body.price,
+        req.body.cover,
+    ]
+
+    db.query(q, [...values, bookId], (err, data) => {
+        if (err) return res.json(err)
+        return res.json("librarybooks has been Updated Succesfully")
+    })
+})
+//--------------- Update condition ---------------
+
+
+//--------------- delete condition ---------------
+app.delete("/librarybooks/:id", (req, res) => {
+    // this params represent /books
+    const bookId = req.params.id;
+    // const q = "DELETE FROM books WHERE id = ?"
+    const q = "DELETE FROM librarybooks WHERE id = ?"
+
+    db.query(q, [bookId], (err, data) => {
+        if (err) return res.json(err)
+        return res.json("librarybooks has been DELETED Succesfully")
+    })
+})
+//--------------- delete condition ---------------
+
+
+// -----------------------------------------------
+// -----------------------------librarybooks-------------------------------
+// ------------------------------------------------------------------------
 
 // to run on this port method 
 // app.listen(8800, () => {

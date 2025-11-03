@@ -1,26 +1,27 @@
-.dashboard-books{
+.dashboard-books {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     justify-content: space-between;
 }
 
-.dashboard-book-child{
- text-align: center;
+.dashboard-book-child {
+    text-align: center;
+    width: 32%;
 }
 
-.dashboard-book-child img{
+.dashboard-book-child img {
     height: 150px;
     width: 200px;
-    background-color:rgb(173, 235, 214);
+    background-color: rgb(173, 235, 214);
 }
 
-.dashboard-delup-btn{
+.dashboard-delup-btn {
     display: flex;
     flex-direction: column;
 }
 
-.dashboard-NewBook-button{
+.dashboard-NewBook-button {
     display: flex;
     justify-content: center;
     margin-top: 20px;

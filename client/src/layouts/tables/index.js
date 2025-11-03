@@ -115,7 +115,8 @@ function Tables() {
   const handleClick = async e => {
     e.preventDefault()
     try {
-      await axios.post("http://localhost:8800/books", book)
+      // await axios.post("http://localhost:8800/books", book)
+      await axios.post("https://library-management-s4mr.onrender.com/librarybooks", book)
       navigate("/dashboard")
     } catch (err) {
       console.log(err);

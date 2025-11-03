@@ -47,8 +47,9 @@ function Dashboard() {
   useEffect(() => {
     const fetchAllBooks = async () => {
       try {
-        const res = await axios.get("http://localhost:8800/books")
-        console.log(res);
+        // const res = await axios.get("http://localhost:8800/books")
+        const res = await axios.get("https://library-management-s4mr.onrender.com/librarybooks")
+        console.log(res.data , "librarybooks" );
         setBooks(res.data);
       } catch (err) {
         console.log(err);
@@ -61,7 +62,8 @@ function Dashboard() {
   // ---------------------------- Delete Funcation
   const handleDelete = async (id) => {
     try {
-      await axios.delete("http://localhost:8800/books/" + id)
+      // await axios.delete("http://localhost:8800/books/" + id)
+      await axios.delete("https://library-management-s4mr.onrender.com/librarybooks/" + id)
       window.location.reload()
     } catch (err) {
       console.log(err, "delete error");
@@ -182,7 +184,7 @@ function Dashboard() {
                     <div className="dashboard-book-child" key={book.id}>
                       {book.cover && <img src={book.cover} alt='' />}
                       <h2>{book.title}</h2>
-                      <p>{book.desc}</p>
+                      <p>{book.description}</p>
                       <span>{book.price}</span>
 
                       <div className="dashboard-delup-btn">
