@@ -204,14 +204,22 @@ app.delete("/librarybooks/:id", (req, res) => {
 app.post("/studentdata", (req, res) => {
     const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate`) VALUES (?)";
 
+    // Convert ISO date strings (from frontend) to YYYY-MM-DD
+    const formatDate = (dateStr) => {
+        if (!dateStr) return null;
+        return dateStr.split("T")[0]; // "2025-11-04T00:00:00.000Z" → "2025-11-04"
+    };
+
     const values = [
         req.body.studentName,
         req.body.rollNo,
         req.body.std,
         req.body.divi, // we are reading "div" from frontend
         req.body.bookName,
-        req.body.currentDate,
-        req.body.lastDate,
+        // req.body.currentDate,
+        // req.body.lastDate,
+        formatDate(req.body.currentDate),
+        formatDate(req.body.lastDate),
     ];
 
     db.query(q, [values], (err, data) => {
