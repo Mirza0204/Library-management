@@ -204,8 +204,10 @@ app.delete("/librarybooks/:id", (req, res) => {
 
 // })
 
-// --------------------------------------------
-// --------------------------------------------
+
+// --------------------------------------------------
+// studentdata
+// --------------------------------------------------
 app.post("/studentdata", (req, res) => {
   const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate`) VALUES (?)";
   
@@ -227,6 +229,17 @@ app.post("/studentdata", (req, res) => {
     return res.json({ message: "Student added successfully!" });
   });
 });
+
+
+// --------------------------------------------
+app.get("/studentdata", (req, res) => {
+    const q = "SELECT * FROM studentdata"
+    db.query(q, (err, data) => {
+        if (err) return res.json(err)
+        return res.json(data)
+    })
+})
+
 
 // --------------------------------------------
 // --------------------------------------------
