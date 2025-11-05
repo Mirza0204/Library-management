@@ -31,68 +31,68 @@ import DataTable from "examples/Tables/DataTable";
 import authorsTableData from "layouts/tables/data/authorsTableData";
 import projectsTableData from "layouts/tables/data/projectsTableData";
 import "./data/EmployeeTable.css";
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { useEffect, useState } from "react";
 import "../tables/tables.css"
 
 
-const employees = [
-  {
-    img: "https://i.pravatar.cc/40?img=1",
-    name: "John Michael",
-    email: "john@creative-tim.com",
-    role: "Manager",
-    dept: "Organization",
-    status: "ONLINE",
-    employed: "23/04/18",
-  },
-  {
-    img: "https://i.pravatar.cc/40?img=2",
-    name: "Alexa Liras",
-    email: "alexa@creative-tim.com",
-    role: "Programator",
-    dept: "Developer",
-    status: "OFFLINE",
-    employed: "11/01/19",
-  },
-  {
-    img: "https://i.pravatar.cc/40?img=3",
-    name: "Laurent Perrier",
-    email: "laurent@creative-tim.com",
-    role: "Executive",
-    dept: "Projects",
-    status: "ONLINE",
-    employed: "19/09/17",
-  },
-  {
-    img: "https://i.pravatar.cc/40?img=4",
-    name: "Michael Levi",
-    email: "michael@creative-tim.com",
-    role: "Programator",
-    dept: "Developer",
-    status: "ONLINE",
-    employed: "24/12/08",
-  },
-  {
-    img: "https://i.pravatar.cc/40?img=5",
-    name: "Richard Gran",
-    email: "richard@creative-tim.com",
-    role: "Manager",
-    dept: "Executive",
-    status: "OFFLINE",
-    employed: "04/10/21",
-  },
-  {
-    img: "https://i.pravatar.cc/40?img=6",
-    name: "Miriam Eric",
-    email: "miriam@creative-tim.com",
-    role: "Programator",
-    dept: "Developer",
-    status: "OFFLINE",
-    employed: "14/09/20",
-  },
-];
+// const employees = [
+//   {
+//     img: "https://i.pravatar.cc/40?img=1",
+//     name: "John Michael",
+//     email: "john@creative-tim.com",
+//     role: "Manager",
+//     dept: "Organization",
+//     status: "ONLINE",
+//     employed: "23/04/18",
+//   },
+//   {
+//     img: "https://i.pravatar.cc/40?img=2",
+//     name: "Alexa Liras",
+//     email: "alexa@creative-tim.com",
+//     role: "Programator",
+//     dept: "Developer",
+//     status: "OFFLINE",
+//     employed: "11/01/19",
+//   },
+//   {
+//     img: "https://i.pravatar.cc/40?img=3",
+//     name: "Laurent Perrier",
+//     email: "laurent@creative-tim.com",
+//     role: "Executive",
+//     dept: "Projects",
+//     status: "ONLINE",
+//     employed: "19/09/17",
+//   },
+//   {
+//     img: "https://i.pravatar.cc/40?img=4",
+//     name: "Michael Levi",
+//     email: "michael@creative-tim.com",
+//     role: "Programator",
+//     dept: "Developer",
+//     status: "ONLINE",
+//     employed: "24/12/08",
+//   },
+//   {
+//     img: "https://i.pravatar.cc/40?img=5",
+//     name: "Richard Gran",
+//     email: "richard@creative-tim.com",
+//     role: "Manager",
+//     dept: "Executive",
+//     status: "OFFLINE",
+//     employed: "04/10/21",
+//   },
+//   {
+//     img: "https://i.pravatar.cc/40?img=6",
+//     name: "Miriam Eric",
+//     email: "miriam@creative-tim.com",
+//     role: "Programator",
+//     dept: "Developer",
+//     status: "OFFLINE",
+//     employed: "14/09/20",
+//   },
+// ];
 
 function Tables() {
   const { columns, rows } = authorsTableData();
@@ -102,17 +102,6 @@ function Tables() {
     desc: "",
     price: null,
     cover: ""
-  });
-
-  // Add Student useState Condition 
-  const [student, setStudent] = useState({
-    studentName: "",
-    rollNo: "",
-    std: "",
-    div: "",
-    bookName: "",
-    currentDate: "",
-    lastDate: ""
   });
 
   // ------------------------------------------------------------------
@@ -130,10 +119,6 @@ function Tables() {
 
     fetchBooks();
   }, []);
-
-  const handleTableBooks = (e) => {
-    setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
   // ----------------------- your API and store books ---------------------
 
 
@@ -155,6 +140,75 @@ function Tables() {
       console.log(err);
     }
   }
+
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+  // Add Student useState Condition 
+  const [student, setStudent] = useState({
+    studentName: "",
+    rollNo: "",
+    std: "",
+    divi: "",
+    bookName: "",
+    currentDate: "",
+    lastDate: "",
+    status: "", // Default status
+  });
+  // ---------------------------- Add Funcation
+  const [studentdata, setStudentdata] = useState([])
+  const handleAddStudent = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("https://library-management-s4mr.onrender.com/studentdata", student);
+      alert("✅ Student added successfully!");
+      window.location.reload()
+    } catch (err) {
+      console.error("Error adding student:", err);
+      alert("❌ Failed to add student");
+    }
+  };
+  // ---------------------------- Add Funcation
+
+  const handlestudentdata = (e) => {
+    setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+
+  // ---------------------------- Get Data Funcation
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchAllBooks = async () => {
+      try {
+        // const res = await axios.get("http://localhost:8800/books")
+        const res = await axios.get("https://library-management-s4mr.onrender.com/studentdata")
+        console.log(res.data, "studentdata");
+        setStudentdata(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchAllBooks()
+  }, [location.state?.updated])
+  // ---------------------------- Get Data Funcation
+
+  // ---------------------------- Delete Funcation
+  const handleDeletestudent = async (id) => {
+    console.log("deleteid", id);
+
+    try {
+      // await axios.delete("http://localhost:8800/books/" + id)
+      await axios.delete("https://library-management-s4mr.onrender.com/studentdata/" + id)
+      // window.location.reload()
+      setStudentdata((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      console.log(err, "delete error");
+    }
+  }
+  // ---------------------------- Delete Funcation
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
 
   return (
     <DashboardLayout>
@@ -202,40 +256,84 @@ function Tables() {
 
             <div className='form Student-tables-form '>
               <h3>Add Student Data</h3>
-              <div >
+              <div>
                 <div className="Student-form-input">
-                  <input className="tables-input-child" type="text" placeholder='Student Name' onChange={handleChange} name='title' />
-                  <input className="tables-input-child" type="number" placeholder='Student RollNo' onChange={handleChange} name='desc' />
-                  <input className="tables-input-child" type="number" placeholder='STD(class)' onChange={handleChange} name='price' />
-                  <input className="tables-input-child" type="text" placeholder='Div(A,B,C...)' onChange={handleChange} name='cover' />
+                  <input
+                    className="tables-input-child"
+                    type="text"
+                    placeholder="Student Name"
+                    onChange={handlestudentdata}
+                    name="studentName"
+                    value={student.studentName}
+                  />
+                  <input
+                    className="tables-input-child"
+                    type="number"
+                    placeholder="Student RollNo"
+                    onChange={handlestudentdata}
+                    name="rollNo"
+                    value={student.rollNo}
+                  />
+                  <input
+                    className="tables-input-child"
+                    type="text"
+                    placeholder="STD (class)"
+                    onChange={handlestudentdata}
+                    name="std"
+                    value={student.std}
+                  />
+                  <input
+                    className="tables-input-child"
+                    type="text"
+                    placeholder="Div (A, B, C...)"
+                    onChange={handlestudentdata}
+                    name="divi"
+                    value={student.divi}
+                  />
                 </div>
-                <div className="Student-form-input">
-                  {/* <input className="tables-input-child" type="text" placeholder='BookName' onChange={handleChange} name='cover' /> */}
-                  <div className="Student-form-input">
-                    {/* Dropdown for Book Name */}
-                    <select
-                      className="tables-input-child"
-                      name="bookName"
-                      onChange={handleTableBooks}
-                      value={student.bookName}
-                    >
-                      <option value="">Select Book</option>
-                      {tableBooks.map((book) => (
-                        <option key={book.id} value={book.title}>
-                          {book.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
 
-                  <input className="tables-input-child" type="number" placeholder='Current Date' onChange={handleChange} name='cover' />
-                  <input className="tables-input-child" type="number" placeholder='Last Date' onChange={handleChange} name='cover' />
+                <div className="Student-form-input">
+                  {/* Dropdown for Book Name */}
+                  <select
+                    className="tables-input-child"
+                    name="bookName"
+                    onChange={handlestudentdata}
+                    value={student.bookName}
+                  >
+                    <option value="">Select Book</option>
+                    {tableBooks.map((book) => (
+                      <option key={book.id} value={book.title}>
+                        {book.title}
+                      </option>
+                    ))}
+                  </select>
+
+                  <input
+                    className="tables-input-child"
+                    type="date"
+                    placeholder="Current Date"
+                    onChange={handlestudentdata}
+                    name="currentDate"
+                    value={student.currentDate}
+                  />
+                  <input
+                    className="tables-input-child"
+                    type="date"
+                    placeholder="Last Date"
+                    onChange={handlestudentdata}
+                    name="lastDate"
+                    value={student.lastDate}
+                  />
                 </div>
               </div>
+
               <div className="tables-form-btn">
-                <button className='formbutton'>Added</button>
+                <button className="formbutton" onClick={handleAddStudent}>
+                  Added
+                </button>
               </div>
             </div>
+
           </Grid>
           <Grid item xs={12}>
             {/* <Card>
@@ -267,38 +365,63 @@ function Tables() {
               <table className="table align-middle">
                 <thead>
                   <tr>
-                    <th>AUTHOR</th>
-                    <th>FUNCTION</th>
+                    <th>Student Name & Book</th>
+                    <th>STD & DIV</th>
+                    <th>RollNo</th>
                     <th>STATUS</th>
-                    <th>EMPLOYED</th>
+                    <th>Last Date</th>
                     <th>ACTION</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map((emp, i) => (
-                    <tr key={i}>
-                      <td>
-                        <div className="d-flex align-items-center prof-img-name">
-                          <img src={emp.img} alt={emp.name} className="avatar me-3" />
-                          <div>
-                            <div className="fw-bold">{emp.name}</div>
-                            <div className="text-muted small">{emp.email}</div>
+                  {studentdata.length > 0 ? (
+                    studentdata.map((emp) => (
+                      <tr key={emp.id}>
+                        <td>
+                          <div className="d-flex align-items-center prof-img-name">
+                            <div>
+                              <div className="fw-bold">{emp.studentName}</div>
+                              <div className="text-muted small">{emp.bookName}</div>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="fw-semibold">{emp.role}</div>
-                        <div className="text-muted small func-small">{emp.dept}</div>
-                      </td>
-                      <td>
-                        <span>{emp.status}</span>
-                      </td>
-                      <td className="text-muted">{emp.employed}</td>
-                      <td>
-                        <button className="btn btn-link text-decoration-none">Edit</button>
+                        </td>
+                        <td>
+                          <div className="fw-semibold">{emp.std}</div>
+                          <div className="text-muted small func-small">{emp.divi}</div>
+                        </td>
+                        <td>
+                          <span>{emp.rollNo}</span>
+                        </td>
+
+                        {/* STATUS DROPDOWN */}
+
+                        <td className="text-muted"
+                          style={{
+                            color: emp.status === "Pending" ? "blue" : emp.status === "Received" ? "red" : "black"
+                          }}
+
+                        >{emp.status}</td>
+
+                        {/* <td className="text-muted">{emp.lastDate}</td> */}
+                        <td className="text-muted">{emp.lastDate ? emp.lastDate.split("T")[0] : ""}</td>
+                        <td>
+                          <button className="btn btn-link text-decoration-none"><Link to={`/Updatestudent/${emp.id}`}>Update</Link></button>
+                          <button
+                            className="btn btn-link text-decoration-none"
+                            onClick={() => handleDeletestudent(emp.id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="text-center text-muted">
+                        No student data found.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

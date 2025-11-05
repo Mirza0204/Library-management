@@ -89,8 +89,6 @@ function Billing() {
   const handleClick = async e => {
     e.preventDefault()
     try {
-      // await axios.put("http://localhost:8800/books/" + bookId , book)
-      // await axios.put(`http://localhost:8800/books/${bookId}`, book)
       await axios.put(`https://library-management-s4mr.onrender.com/librarybooks/${bookId}`, bookLibrary)
       navigate("/dashboard")
     } catch (err) {

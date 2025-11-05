@@ -202,7 +202,7 @@ app.delete("/librarybooks/:id", (req, res) => {
 // studentdata
 // ------------------------------------------------------------------
 app.post("/studentdata", (req, res) => {
-    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate`) VALUES (?)";
+    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
 
     // Convert ISO date strings (from frontend) to YYYY-MM-DD
     const formatDate = (dateStr) => {
@@ -220,6 +220,7 @@ app.post("/studentdata", (req, res) => {
         // req.body.lastDate,
         formatDate(req.body.currentDate),
         formatDate(req.body.lastDate),
+        req.body.status || "Pending", // <-- Default to 'Pending'
     ];
 
     db.query(q, [values], (err, data) => {
@@ -228,7 +229,7 @@ app.post("/studentdata", (req, res) => {
             return res.status(500).json({ message: "Database insert failed" });
         }
         // return res.json({ message: "Student added successfully!" });
-         return res.json({ success: true, data });
+        return res.json({ success: true, data });
     });
 });
 
@@ -249,7 +250,7 @@ app.put("/studentdata/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `bookName`=?, `currentDate`=?, `lastDate`=?  WHERE id=?"
+    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `bookName`=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
 
 
     const values = [
@@ -260,6 +261,7 @@ app.put("/studentdata/:id", (req, res) => {
         req.body.bookName,
         req.body.currentDate,
         req.body.lastDate,
+        req.body.status, // Added
     ]
 
     db.query(q, [...values, bookId], (err, data) => {
