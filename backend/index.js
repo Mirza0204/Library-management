@@ -204,7 +204,7 @@ app.delete("/librarybooks/:id", (req, res) => {
 // studentdata
 // ------------------------------------------------------------------
 app.post("/studentdata", (req, res) => {
-    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `standard`, `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
+    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `divi`, `standard`, `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
 
     // Convert ISO date strings (from frontend) to YYYY-MM-DD
     const formatDate = (dateStr) => {
