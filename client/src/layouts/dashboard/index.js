@@ -185,10 +185,10 @@ function Dashboard() {
                   {books.map((book) => (
                     <div className="dashboard-book-child" key={book.id}>
                       {book.cover && <img src={book.cover} alt='' />}
-                      <h2>{book.title}</h2>
-                      <h2>{book.standard}</h2>
+                      <h2>Book Name: {book.title}</h2>
+                      <h4>Std: {book.standard}</h4>
                       <p>{book.description}</p>
-                      <span>{book.price}</span>
+                      <span>💸: {book.price}/-Rs</span>
 
                       <div className="dashboard-delup-btn">
                         <button className='delete' onClick={() => handleDelete(book.id)}>Delete</button>

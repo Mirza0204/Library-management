@@ -204,7 +204,7 @@ app.delete("/librarybooks/:id", (req, res) => {
 // studentdata
 // ------------------------------------------------------------------
 app.post("/studentdata", (req, res) => {
-    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
+    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `std`, `divi`, `standard`, `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
 
     // Convert ISO date strings (from frontend) to YYYY-MM-DD
     const formatDate = (dateStr) => {
@@ -217,6 +217,7 @@ app.post("/studentdata", (req, res) => {
         req.body.rollNo,
         req.body.std,
         req.body.divi, // we are reading "div" from frontend
+        req.body.standard,
         req.body.bookName,
         // req.body.currentDate,
         // req.body.lastDate,
@@ -252,7 +253,7 @@ app.put("/studentdata/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `bookName`=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
+    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `standard=?`, `bookName`=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
 
 
     const values = [
@@ -260,6 +261,7 @@ app.put("/studentdata/:id", (req, res) => {
         req.body.rollNo,
         req.body.std,
         req.body.divi, // we are reading "div" from frontend
+        req.body.standard,
         req.body.bookName,
         req.body.currentDate,
         req.body.lastDate,
