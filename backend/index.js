@@ -129,9 +129,10 @@ app.put("/books/:id", (req, res) => {
 // librarybooks
 // ----------------------------------------------------------
 app.post("/librarybooks", (req, res) => {
-    const q = "INSERT INTO librarybooks (`title`, `description`, `price`, `cover`) VALUES (?)";
+    const q = "INSERT INTO librarybooks (`title`, `standard`  , `description`, `price`, `cover`) VALUES (?)";
     const values = [
         req.body.title,
+        req.body.standard,
         req.body.description,
         req.body.price,
         req.body.cover,
@@ -161,11 +162,12 @@ app.put("/librarybooks/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE librarybooks SET `title`=?, `description`=?, `price`=?, `cover`=? WHERE id=?"
+    const q = "UPDATE librarybooks SET `title`=?, `standard=?` , `description`=?, `price`=?, `cover`=? WHERE id=?"
 
 
     const values = [
         req.body.title,
+        req.body.standard,
         req.body.description,
         req.body.price,
         req.body.cover,

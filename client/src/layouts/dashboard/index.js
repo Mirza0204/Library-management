@@ -186,6 +186,7 @@ function Dashboard() {
                     <div className="dashboard-book-child" key={book.id}>
                       {book.cover && <img src={book.cover} alt='' />}
                       <h2>{book.title}</h2>
+                      <h2>{book.standard}</h2>
                       <p>{book.description}</p>
                       <span>{book.price}</span>
 

@@ -99,6 +99,7 @@ function Tables() {
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [book, setBook] = useState({
     title: "",
+    standard: "",
     desc: "",
     price: null,
     cover: ""
@@ -245,6 +246,7 @@ function Tables() {
               <h3>Add New-Book</h3>
               <div className="tables-form-input">
                 <input className="tables-input-child" type="text" placeholder='title' onChange={handleChange} name='title' />
+                <input className="tables-input-child" type="text" placeholder='standard' onChange={handleChange} name='standard' />
                 <input className="tables-input-child" type="text" placeholder='desc' onChange={handleChange} name='desc' />
                 <input className="tables-input-child" type="number" placeholder='price' onChange={handleChange} name='price' />
                 <input className="tables-input-child" type="text" placeholder='cover' onChange={handleChange} name='cover' />
