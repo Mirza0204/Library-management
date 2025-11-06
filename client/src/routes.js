@@ -67,21 +67,22 @@ const routes = [
     route: "/tables",
     component: <Tables />,
   },
+      {
+    type: "collapse",
+    name: "Add New-Book",
+    key: "Add New-Book",
+    icon: <Icon fontSize="small">Add</Icon>,
+    route: "/Addnewbook",
+    component: <Addnewbook/>,
+  },
+
   {
     type: "collapse",
-    name: "Billing",
+    name: "Update The Book",
     key: "billing",
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/billing/:id",
     component: <Billing />,
-  },
-    {
-    type: "collapse",
-    name: "Updatestudent",
-    key: "Updatestudent",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/Addnewbook",
-    component: <Addnewbook/>,
   },
   {
     type: "collapse",

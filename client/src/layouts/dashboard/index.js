@@ -189,6 +189,7 @@ function Dashboard() {
                       <h4>Std: {book.standard}</h4>
                       <p>{book.description}</p>
                       <span>💸: {book.price}/-Rs</span>
+                      <p style={{margin: "0 8px"}}> In library Avaiable: {book.quantity}</p>
 
                       <div className="dashboard-delup-btn">
                         <button className='delete' onClick={() => handleDelete(book.id)}>Delete</button>

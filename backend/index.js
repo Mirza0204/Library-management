@@ -129,13 +129,14 @@ app.put("/books/:id", (req, res) => {
 // librarybooks
 // ----------------------------------------------------------
 app.post("/librarybooks", (req, res) => {
-    const q = "INSERT INTO librarybooks (`title`, `standard`  , `description`, `price`, `cover`) VALUES (?)";
+    const q = "INSERT INTO librarybooks (`title`, `standard`  , `description`, `price`, `cover` , `quantity`) VALUES (?)";
     const values = [
         req.body.title,
         req.body.standard,
         req.body.description,
         req.body.price,
         req.body.cover,
+        req.body.quantity || 0
     ];
 
     db.query(q, [values], (err, data) => {
@@ -162,7 +163,7 @@ app.put("/librarybooks/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE librarybooks SET `title`=?, `standard=?` , `description`=?, `price`=?, `cover`=? WHERE id=?"
+    const q = "UPDATE librarybooks SET `title`=?, `standard=?` , `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
 
 
     const values = [
@@ -171,6 +172,7 @@ app.put("/librarybooks/:id", (req, res) => {
         req.body.description,
         req.body.price,
         req.body.cover,
+        req.body.quantity || 0
     ]
 
     db.query(q, [...values, bookId], (err, data) => {
@@ -194,6 +196,27 @@ app.delete("/librarybooks/:id", (req, res) => {
     })
 })
 //--------------- delete condition ---------------
+
+// Increment quantity by 1
+app.post("/librarybooks/:id/increment", (req, res) => {
+    const bookId = req.params.id;
+    const q = "UPDATE librarybooks SET quantity = quantity + 1 WHERE id = ?";
+    db.query(q, [bookId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json({ success: true, message: "quantity incremented" });
+    });
+});
+
+// Decrement quantity by 1 (not below 0)
+app.post("/librarybooks/:id/decrement", (req, res) => {
+    const bookId = req.params.id;
+    const q = "UPDATE librarybooks SET quantity = GREATEST(quantity - 1, 0) WHERE id = ?";
+    db.query(q, [bookId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json({ success: true, message: "quantity decremented" });
+    });
+});
+
 
 // ------------------------------------------------------------------
 // librarybooks

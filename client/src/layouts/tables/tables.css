@@ -22,6 +22,12 @@
   justify-content: space-between;
 }
 
+.table-form-inputto {
+  display: flex;
+  margin-top: 10px;
+  gap: 90px;
+}
+
 .tables-input-child {
   border: 1px solid rgb(219, 216, 216);
   padding: 9px 7px;
