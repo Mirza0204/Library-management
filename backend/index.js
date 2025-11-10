@@ -125,6 +125,43 @@ app.put("/books/:id", (req, res) => {
 })
 //--------------- Update condition ---------------
 
+
+// ----------------------------------------------------------
+// Library Login
+// ----------------------------------------------------------
+// ✅ LOGIN (Sign In)
+app.post("/signinlibrary", (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password required!" });
+    }
+
+    const q = "SELECT * FROM users WHERE username = ? AND password = ?";
+    db.query(q, [username, password], (err, results) => {
+        if (err) {
+            console.error("❌ Login Error:", err);
+            return res.status(500).json({ message: "Database error" });
+        }
+
+        if (results.length > 0) {
+            console.log("✅ User logged in:", username);
+            return res.json({
+                success: true,
+                message: "Login successful!",
+                redirectUrl: "http://localhost:3000/dashboard"
+            });
+        } else {
+            return res.status(401).json({ success: false, message: "Invalid credentials!" });
+        }
+    });
+});
+
+// ----------------------------------------------------------
+// Library Login
+// ----------------------------------------------------------
+
+
 // ----------------------------------------------------------
 // librarybooks
 // ----------------------------------------------------------
@@ -227,7 +264,13 @@ app.post("/librarybooks/:id/decrement", (req, res) => {
 // studentdata
 // ------------------------------------------------------------------
 app.post("/studentdata", (req, res) => {
-    const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `divi`, `standard`, `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
+    // const q = "INSERT INTO studentdata (`studentName`, `rollNo`, `divi`, `standard`, `quantity` , `bookName`, `currentDate`, `lastDate` , `status`) VALUES (?)";
+
+    const q = `
+    INSERT INTO studentdata 
+    (\`studentName\`, \`rollNo\`, \`divi\`, \`standard\`, \`bookName\`, \`quantity\`, \`currentDate\`, \`lastDate\`, \`status\`) 
+    VALUES (?)
+  `;
 
     // Convert ISO date strings (from frontend) to YYYY-MM-DD
     const formatDate = (dateStr) => {
@@ -241,6 +284,8 @@ app.post("/studentdata", (req, res) => {
         req.body.divi, // we are reading "div" from frontend
         req.body.standard,
         req.body.bookName,
+        //  req.body.quantity || 1,
+        Number(req.body.quantity),
         // req.body.currentDate,
         // req.body.lastDate,
         formatDate(req.body.currentDate),
@@ -275,7 +320,7 @@ app.put("/studentdata/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `standard=?`, `bookName`=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
+    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `std`=?, `divi`=?, `standard=?`, `bookName`=?, quantity=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
 
 
     const values = [
@@ -284,6 +329,7 @@ app.put("/studentdata/:id", (req, res) => {
         req.body.divi, // we are reading "div" from frontend
         req.body.standard,
         req.body.bookName,
+        req.body.quantity || 1,
         req.body.currentDate,
         req.body.lastDate,
         req.body.status, // Added

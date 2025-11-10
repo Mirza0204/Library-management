@@ -129,7 +129,7 @@ function Tables() {
     setBook(prev => ({ ...prev, [e.target.name]: e.target.value }))
   };
 
-  console.log(book, "checkingvalue is coming");
+  // console.log(book, "checkingvalue is coming");
 
   const handleClick = async e => {
     e.preventDefault()
@@ -151,25 +151,91 @@ function Tables() {
     standard: "",
     divi: "",
     bookName: "",
+    quantity: 1,
     currentDate: "",
     lastDate: "",
     status: "", // Default status
   });
   // ---------------------------- Add Funcation
   const [studentdata, setStudentdata] = useState([])
+  // const handleAddStudent = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     await axios.post("https://library-management-s4mr.onrender.com/studentdata", student);
+  //     alert("✅ Student added successfully!");
+  //     window.location.reload()
+  //   } catch (err) {
+  //     console.error("Error adding student:", err);
+  //     alert("❌ Failed to add student");
+  //   }
+  // };
+
+  const [studentPayload, setStudentPayload] = useState()
+  const [bookPayload, setBookPayload] = useState()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+
   const handleAddStudent = async (e) => {
     e.preventDefault();
+
+    if (!selectedBook) {
+      alert("Please select a book first!");
+      return;
+    }
+    if (takeQuantity > bookCount) {
+      alert(`Only ${bookCount} books available!`);
+      return;
+    }
+
+    // Build clean payload
+    const payload = {
+      studentName: student.studentName,
+      rollNo: student.rollNo,
+      divi: student.divi,
+      standard: student.standard,
+      bookName: student.bookName,
+      quantity: Number(takeQuantity),
+      currentDate: student.currentDate,
+      lastDate: student.lastDate,
+      status: student.status || "Pending"
+    };
+
+    console.log("Sending student POST payload:", payload);
+
     try {
-      await axios.post("https://library-management-s4mr.onrender.com/studentdata", student);
+      setIsSubmitting(true);
+      const res = await axios.post("https://library-management-s4mr.onrender.com/studentdata", payload);
+      console.log("POST response:", res.data);
+
+      // If server returns the inserted row, append it to UI state
+      if (res.data?.inserted) {
+        setStudentdata(prev => [...prev, res.data.inserted]);
+      } else {
+        // fallback: re-fetch the list
+        const all = await axios.get("https://library-management-s4mr.onrender.com/studentdata");
+        setStudentdata(all.data);
+      }
+
+      // decrement book count
+      await axios.post(`https://library-management-s4mr.onrender.com/librarybooks/${selectedBook.id}/decrement`, {
+        quantity: Number(takeQuantity)
+      });
+
       alert("✅ Student added successfully!");
-      window.location.reload()
     } catch (err) {
       console.error("Error adding student:", err);
       alert("❌ Failed to add student");
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
   // ---------------------------- Add Funcation
   const [filteredBooks, setFilteredBooks] = useState([]);
+
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [bookCount, setBookCount] = useState(0);
+  const [takeQuantity, setTakeQuantity] = useState(1);
 
   const handlestudentdata = (e) => {
     const { name, value } = e.target;
@@ -180,6 +246,23 @@ function Tables() {
       const filtered = tableBooks.filter((book) => book.standard === value);
       setFilteredBooks(filtered);
       setStudent((prev) => ({ ...prev, standard: value, bookName: "" })); // reset bookName
+      setSelectedBook(null);
+      setBookCount(0);
+      setTakeQuantity(1);
+    }
+
+    if (name === "bookName") {
+      const foundBook = tableBooks.find((book) => book.title === value);
+      if (foundBook) {
+        setSelectedBook(foundBook);
+        setBookCount(foundBook.quantity || 0);
+        setTakeQuantity(1); // ✅ reset quantity when selecting new book
+      }
+      else {
+        setSelectedBook(null);
+        setBookCount(0);
+        setTakeQuantity(1);
+      }
     }
 
   };
@@ -193,7 +276,7 @@ function Tables() {
       try {
         // const res = await axios.get("http://localhost:8800/books")
         const res = await axios.get("https://library-management-s4mr.onrender.com/studentdata")
-        console.log(res.data, "studentdata");
+        console.log(res.data, "studentdata in this log");
         setStudentdata(res.data);
       } catch (err) {
         console.log(err);
@@ -353,6 +436,23 @@ function Tables() {
                     )}
                   </select>
 
+                  {selectedBook && (
+                    <div className="BooksCount-Input">
+                      <p>Available:  {selectedBook ? bookCount : 0} </p>
+                      {/* Quantity input (disabled for now) */}
+                      <input
+                        type="number"
+                        min="1"
+                        max={bookCount || 1}
+                        value={takeQuantity}
+                        onChange={(e) => setTakeQuantity(Number(e.target.value))}
+                        placeholder="Enter quantity"
+                        className="tables-input-child"
+                        disabled={!selectedBook}
+                      />
+                    </div>
+                  )}
+
                   <input
                     className="tables-input-child"
                     type="date"
@@ -373,39 +473,17 @@ function Tables() {
               </div>
 
               <div className="tables-form-btn">
-                <button className="formbutton" onClick={handleAddStudent}>
+                {/* <button className="formbutton" onClick={handleAddStudent}>
                   Added
+                </button> */}
+                <button type="button" className="formbutton" onClick={handleAddStudent} disabled={isSubmitting}>
+                  {isSubmitting ? "Saving..." : "Added"}
                 </button>
               </div>
             </div>
 
           </Grid>
           <Grid item xs={12}>
-            {/* <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="white">
-                  Projects Table
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                <DataTable
-                  table={{ columns: pColumns, rows: pRows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
-              </MDBox>
-            </Card> */}
             <div className="container mt-4 employee-table">
               <table className="table align-middle">
                 <thead>
@@ -436,7 +514,7 @@ function Tables() {
                               <div className="d-flex align-items-center prof-img-name">
                                 <div>
                                   <div className="fw-bold">{emp.studentName}</div>
-                                  <div className="text-muted small">{emp.bookName}</div>
+                                  <div className="text-muted small">{emp.bookName}  <span>Qty: {emp.quantity}</span></div>
                                 </div>
                               </div>
                             </td>

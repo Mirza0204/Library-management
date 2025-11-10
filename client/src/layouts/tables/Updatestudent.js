@@ -37,14 +37,6 @@ import { useEffect, useState } from "react";
 import "../tables/tables.css"
 
 function Updatestudent() {
-    const { columns, rows } = authorsTableData();
-    const { columns: pColumns, rows: pRows } = projectsTableData();
-    const [book, setBook] = useState({
-        title: "",
-        desc: "",
-        price: null,
-        cover: ""
-    });
 
     const location = useLocation()
     console.log(location.pathname.split("/")[2], "want update id");
@@ -67,27 +59,6 @@ function Updatestudent() {
         fetchBooks();
     }, []);
     // ----------------------- your API and store books ---------------------
-
-
-    const navigate = useNavigate()
-
-    const handleChange = (e) => {
-        setBook(prev => ({ ...prev, [e.target.name]: e.target.value }))
-    };
-
-    // console.log(book, "checkingvalue is coming");
-
-    const handleClick = async e => {
-        e.preventDefault()
-        try {
-            // await axios.post("http://localhost:8800/books", book)
-            await axios.post("https://library-management-s4mr.onrender.com/librarybooks", book)
-            navigate("/dashboard")
-        } catch (err) {
-            console.log(err);
-        }
-    }
-
     // -------------------------------------------------------------------
     // -------------------------------------------------------------------
     // Add Student useState Condition 
@@ -118,7 +89,7 @@ function Updatestudent() {
             );
             // navigate("/tables")
             // ✅ force reload after navigate
-            navigate("/tables", { state: { updated: true } });
+            // navigate("/tables", { state: { updated: true } });
             window.location.reload();
         } catch (err) {
             console.error("Error adding student:", err);
@@ -128,7 +99,9 @@ function Updatestudent() {
     // ---------------------------- Add Funcation
 
     const handlestudentdata = (e) => {
-        setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        // setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        setStudent((prev) => ({ ...prev, [name]: value }));
     };
 
 
@@ -185,22 +158,6 @@ function Updatestudent() {
         fetchAllBooks()
     }, [location]) // runs again when route changes
     // ---------------------------- Get Data Funcation
-
-    // ---------------------------- Delete Funcation
-    const handleDeletestudent = async (id) => {
-        console.log("deleteid", id);
-
-        try {
-            // await axios.delete("http://localhost:8800/books/" + id)
-            await axios.delete("https://library-management-s4mr.onrender.com/studentdata/" + id)
-            // window.location.reload()
-            setStudentdata((prev) => prev.filter((s) => s.id !== id));
-        } catch (err) {
-            console.log(err, "delete error");
-        }
-    }
-    // ---------------------------- Delete Funcation
-    // -------------------------------------------------------------------
     // -------------------------------------------------------------------
 
     return (

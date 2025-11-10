@@ -49,6 +49,7 @@ import SignUp from "layouts/authentication/sign-up";
 import Icon from "@mui/material/Icon";
 import Updatestudent from "layouts/tables/Updatestudent";
 import Addnewbook from "layouts/tables/Addnewbook";
+import LibSignIn from "layouts/profile/LibSignIn";
 
 const routes = [
   {
@@ -121,8 +122,8 @@ const routes = [
     name: "Sign In",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
+    route: "/LibSignIn",
+    component: <LibSignIn />,
   },
   {
     type: "collapse",

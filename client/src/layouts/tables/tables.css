@@ -28,6 +28,16 @@
   gap: 90px;
 }
 
+.BooksCount-Input{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.BooksCount-Input p{
+  font-size: 15px;
+}
+
 .tables-input-child {
   border: 1px solid rgb(219, 216, 216);
   padding: 9px 7px;
