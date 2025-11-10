@@ -129,7 +129,7 @@ app.put("/books/:id", (req, res) => {
 // ----------------------------------------------------------
 // Library Login
 // ----------------------------------------------------------
-// ✅ LOGIN (Sign In)
+
 app.post("/signinlibrary", (req, res) => {
     const { username, password } = req.body;
 
@@ -156,6 +156,19 @@ app.post("/signinlibrary", (req, res) => {
         }
     });
 });
+
+// ----------------------------------------------------------
+// ✅ Library Sign Out
+// ----------------------------------------------------------
+app.post("/signoutlibrary", (req, res) => {
+    console.log("✅ User logged out");
+    return res.json({
+        success: true,
+        message: "Logout successful!",
+        redirectUrl: "http://localhost:3000/logout"
+    });
+});
+
 
 // ----------------------------------------------------------
 // Library Login
