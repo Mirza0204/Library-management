@@ -277,7 +277,7 @@ app.put("/librarybooks/:id", (req, res) => {
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
     // const q = "UPDATE librarybooks SET `title` =?, `standard` =? , `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
-    const q = "UPDATE librarybooks SET `title`=?, `standard`=?, `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
+    const q = "UPDATE librarybooks SET `title`=?, `standard`=?, `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?";
 
 
     const values = [
