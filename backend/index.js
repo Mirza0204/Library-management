@@ -322,15 +322,22 @@ app.post("/librarybooks/:id/increment", (req, res) => {
 });
 
 // Decrement quantity by 1 (not below 0)
+// ✅ New version - decrement by requested quantity
 app.post("/librarybooks/:id/decrement", (req, res) => {
-    console.log("find data" , res);
-    const bookId = req.params.id;
-    const q = "UPDATE librarybooks SET quantity = GREATEST(quantity - 1, 0) WHERE id = ?";
-    db.query(q, [bookId], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json({ success: true, message: "quantity decremented" });
-    });
+  const bookId = req.params.id;
+  const { quantity } = req.body; // 👈 frontend sends the quantity (e.g., 3, 4, 6)
+  
+  if (!quantity || quantity <= 0) {
+    return res.status(400).json({ success: false, message: "Invalid quantity" });
+  }
+
+  const q = "UPDATE librarybooks SET quantity = GREATEST(quantity - ?, 0) WHERE id = ?";
+  db.query(q, [quantity, bookId], (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json({ success: true, message: `Quantity decremented by ${quantity}` });
+  });
 });
+
 
 
 // Decrement quantity by 1 (not below 0)
