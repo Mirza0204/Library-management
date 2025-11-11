@@ -122,6 +122,8 @@ function Updatestudent() {
                         standard: selectedBook.standard,
                         divi: selectedBook.divi,
                         status: selectedBook.status,
+                        // currentDate: selectedBook.currentDate,
+                        // lastDate: selectedBook.lastDate,
                         currentDate: selectedBook.currentDate
                             ? selectedBook.currentDate.split("T")[0]
                             : "",
@@ -190,7 +192,7 @@ function Updatestudent() {
                                         type="text"
                                         placeholder="STD (class)"
                                         onChange={handlestudentdata}
-                                        name="std"
+                                        name="standard"
                                         value={student.standard}
                                     />
                                     <input
