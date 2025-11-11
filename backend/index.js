@@ -136,43 +136,43 @@ app.put("/books/:id", (req, res) => {
 
 // ✅ LOGIN (Sign In)
 app.post("/signinlibrary", (req, res) => {
-  const { username, password } = req.body;
+    const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ message: "Username and password required!" });
-  }
-
-  // ✅ Use your actual table name 'signinlibrary'
-  const q = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
-
-  db.query(q, [username, password], (err, results) => {
-    if (err) {
-      console.error("❌ Login Error:", err);
-      return res.status(500).json({ message: "Database error", error: err });
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password required!" });
     }
 
-    if (results.length > 0) {
-      console.log("✅ User logged in:", username);
-      return res.json({
-        success: true,
-        message: "Login successful!",
-        redirectUrl: "http://localhost:3000/dashboard",
-      });
-    } else {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials!" });
-    }
-  });
+    // ✅ Use your actual table name 'signinlibrary'
+    const q = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
+
+    db.query(q, [username, password], (err, results) => {
+        if (err) {
+            console.error("❌ Login Error:", err);
+            return res.status(500).json({ message: "Database error", error: err });
+        }
+
+        if (results.length > 0) {
+            console.log("✅ User logged in:", username);
+            return res.json({
+                success: true,
+                message: "Login successful!",
+                redirectUrl: "http://localhost:3000/dashboard",
+            });
+        } else {
+            return res
+                .status(401)
+                .json({ success: false, message: "Invalid credentials!" });
+        }
+    });
 });
 
 // ✅ Optional: Get all users (for testing)
 app.get("/signinlibrary", (req, res) => {
-  const q = "SELECT * FROM signinlibrary";
-  db.query(q, (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.json(data);
-  });
+    const q = "SELECT * FROM signinlibrary";
+    db.query(q, (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json(data);
+    });
 });
 
 
@@ -187,13 +187,13 @@ app.get("/signinlibrary", (req, res) => {
 // Logout koi database entry nahi karta.
 // Woh sirf ek signal hota hai “User ne session end kar diya”.
 app.post("/signoutlibrary", (req, res) => {
-  // In a real system, you'd clear session or token here
-  console.log("✅ User logged out.");
-  return res.json({
-    success: true,
-    message: "Logout successful!",
-    redirectUrl: "http://localhost:3000/LibSignIn",
-  });
+    // In a real system, you'd clear session or token here
+    console.log("✅ User logged out.");
+    return res.json({
+        success: true,
+        message: "Logout successful!",
+        redirectUrl: "http://localhost:3000/LibSignIn",
+    });
 });
 // ----------------------------------------------------------
 // LOGOUT Login
@@ -202,38 +202,38 @@ app.post("/signoutlibrary", (req, res) => {
 
 // ✅ CHANGE PASSWORD
 app.put("/changepasswordlibrary", (req, res) => {
-  const { username, oldPassword, newPassword } = req.body;
+    const { username, oldPassword, newPassword } = req.body;
 
-  if (!username || !oldPassword || !newPassword) {
-    return res.status(400).json({ message: "All fields are required!" });
-  }
-
-  // Check if old password is correct
-  const checkQuery = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
-  db.query(checkQuery, [username, oldPassword], (err, results) => {
-    if (err) {
-      console.error("❌ DB Error:", err);
-      return res.status(500).json({ message: "Database error!" });
+    if (!username || !oldPassword || !newPassword) {
+        return res.status(400).json({ message: "All fields are required!" });
     }
 
-    if (results.length === 0) {
-      return res.status(401).json({ message: "Old password is incorrect!" });
-    }
+    // Check if old password is correct , backend ke app.post("/signinlibrary") me ye line likhi hai 👇
+    const checkQuery = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
+    db.query(checkQuery, [username, oldPassword], (err, results) => {
+        if (err) {
+            console.error("❌ DB Error:", err);
+            return res.status(500).json({ message: "Database error!" });
+        }
 
-    // Update password
-    const updateQuery = "UPDATE signinlibrary SET password = ? WHERE username = ?";
-    db.query(updateQuery, [newPassword, username], (err2) => {
-      if (err2) {
-        console.error("❌ Update Error:", err2);
-        return res.status(500).json({ message: "Could not update password!" });
-      }
+        if (results.length === 0) {
+            return res.status(401).json({ message: "Old password is incorrect!" });
+        }
 
-      return res.json({
-        success: true,
-        message: "Password updated successfully!",
-      });
+        // Update password
+        const updateQuery = "UPDATE signinlibrary SET password = ? WHERE username = ?";
+        db.query(updateQuery, [newPassword, username], (err2) => {
+            if (err2) {
+                console.error("❌ Update Error:", err2);
+                return res.status(500).json({ message: "Could not update password!" });
+            }
+
+            return res.json({
+                success: true,
+                message: "Password updated successfully!",
+            });
+        });
     });
-  });
 });
 
 
@@ -276,7 +276,8 @@ app.put("/librarybooks/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE librarybooks SET `title`=?, `standard=?` , `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
+    // const q = "UPDATE librarybooks SET `title` =?, `standard` =? , `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
+    const q = "UPDATE librarybooks SET `title`=?, `standard`=?, `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
 
 
     const values = [
