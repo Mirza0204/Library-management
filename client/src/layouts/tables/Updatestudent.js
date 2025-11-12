@@ -102,31 +102,38 @@ function Updatestudent() {
         e.preventDefault();
 
         try {
-            // ✅ Step 1: Update student table
-            await axios.put(`https://library-management-s4mr.onrender.com/studentdata/${StudentId}`, student);
+            const { quantity, receivedQuantity, status, bookName, standard } = student;
 
-            // ✅ Step 2: Check if status is "Received"
-            if (student.status === "Received") {
-                // 1️⃣ Get book ID by matching bookName
-                const selectedBook = tableBooks.find((b) => b.title === student.bookName);
+            // Step 1: Update student data
+            await axios.put(
+                `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
+                student
+            );
+
+            // Step 2: Agar kuch books wapas ki gayi (receivedQuantity > 0)
+            if (receivedQuantity > 0) {
+                const selectedBook = tableBooks.find(
+                    (b) => b.title === bookName && b.standard === standard
+                );
 
                 if (selectedBook) {
-                    // 2️⃣ Increment librarybooks quantity by student.quantity
+                    // Step 3: Update librarybooks quantity (+receivedQuantity)
                     await axios.post(
                         `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook.id}/increment`,
-                        { quantity: Number(student.quantity) }
-                    );
-
-                    // 3️⃣ Update student quantity to 0 (since books returned)
-                    await axios.put(
-                        `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
-                        { ...student, quantity: 0 }
+                        { quantity: Number(receivedQuantity) }
                     );
                 }
             }
 
-            alert("✅ Student updated successfully!");
-            window.location.reload();
+            // Step 4: Agar ab quantity == 0 hai toh status automatically Received kar do
+            if (Number(quantity) === 0 && status !== "Received") {
+                await axios.put(
+                    `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
+                    { ...student, status: "Received" }
+                );
+            }
+
+            alert("✅ Student & Library data updated successfully!");
         } catch (err) {
             console.error("Error updating student:", err);
             alert("❌ Failed to update student");
