@@ -77,26 +77,62 @@ function Updatestudent() {
 
     // ---------------------------- Add Funcation
     const [studentdata, setStudentdata] = useState([])
+    // const handleUpdateStudent = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         await axios.put(`https://library-management-s4mr.onrender.com/studentdata/${StudentId}`, student);
+    //         alert("✅ Student added successfully!");
+    //         // ✅ Update UI state instantly without reload
+    //         setStudentdata((prev) =>
+    //             prev.map((item) =>
+    //                 item.id === StudentId ? { ...item, status: student.status } : item
+    //             )
+    //         );
+    //         // navigate("/tables")
+    //         // ✅ force reload after navigate
+    //         // navigate("/tables", { state: { updated: true } });
+    //         // window.location.reload();
+    //     } catch (err) {
+    //         console.error("Error adding student:", err);
+    //         alert("❌ Failed to add student");
+    //     }
+    // };
+
     const handleUpdateStudent = async (e) => {
         e.preventDefault();
+
         try {
+            // ✅ Step 1: Update student table
             await axios.put(`https://library-management-s4mr.onrender.com/studentdata/${StudentId}`, student);
-            alert("✅ Student added successfully!");
-            // ✅ Update UI state instantly without reload
-            setStudentdata((prev) =>
-                prev.map((item) =>
-                    item.id === StudentId ? { ...item, status: student.status } : item
-                )
-            );
-            // navigate("/tables")
-            // ✅ force reload after navigate
-            // navigate("/tables", { state: { updated: true } });
-            // window.location.reload();
+
+            // ✅ Step 2: Check if status is "Received"
+            if (student.status === "Received") {
+                // 1️⃣ Get book ID by matching bookName
+                const selectedBook = tableBooks.find((b) => b.title === student.bookName);
+
+                if (selectedBook) {
+                    // 2️⃣ Increment librarybooks quantity by student.quantity
+                    await axios.post(
+                        `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook.id}/increment`,
+                        { quantity: Number(student.quantity) }
+                    );
+
+                    // 3️⃣ Update student quantity to 0 (since books returned)
+                    await axios.put(
+                        `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
+                        { ...student, quantity: 0 }
+                    );
+                }
+            }
+
+            alert("✅ Student updated successfully!");
+            window.location.reload();
         } catch (err) {
-            console.error("Error adding student:", err);
-            alert("❌ Failed to add student");
+            console.error("Error updating student:", err);
+            alert("❌ Failed to update student");
         }
     };
+
     // ---------------------------- Add Funcation
 
     const handlestudentdata = (e) => {
@@ -122,7 +158,7 @@ function Updatestudent() {
                         standard: selectedBook.standard,
                         divi: selectedBook.divi,
                         bookName: selectedBook.bookName,
-                         quantity: selectedBook.quantity,
+                        quantity: selectedBook.quantity,
                         status: selectedBook.status,
                         // currentDate: selectedBook.currentDate,
                         // lastDate: selectedBook.lastDate,
@@ -232,6 +268,16 @@ function Updatestudent() {
                                         value={student.quantity}
                                         onChange={handlestudentdata}
                                     />
+
+                                    <input
+                                        className="tables-input-child"
+                                        type="number"
+                                        placeholder="Books Received Now"
+                                        name="receivedQuantity"
+                                        value={student.receivedQuantity || ""}
+                                        onChange={handlestudentdata}
+                                    />
+
 
                                     <select
                                         className="tables-input-child"
