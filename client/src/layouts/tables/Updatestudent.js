@@ -68,6 +68,7 @@ function Updatestudent() {
         standard: "",
         divi: "",
         bookName: "",
+        quantity: "",
         status: "", // Default status
         currentDate: "",
         lastDate: "",
@@ -121,6 +122,7 @@ function Updatestudent() {
                         standard: selectedBook.standard,
                         divi: selectedBook.divi,
                         bookName: selectedBook.bookName,
+                         quantity: selectedBook.quantity,
                         status: selectedBook.status,
                         // currentDate: selectedBook.currentDate,
                         // lastDate: selectedBook.lastDate,
@@ -220,6 +222,16 @@ function Updatestudent() {
                                             </option>
                                         ))}
                                     </select>
+
+                                    {/* ✅ Quantity input */}
+                                    <input
+                                        className="tables-input-child"
+                                        type="number"
+                                        placeholder="Enter Quantity"
+                                        name="quantity"
+                                        value={student.quantity}
+                                        onChange={handlestudentdata}
+                                    />
 
                                     <select
                                         className="tables-input-child"

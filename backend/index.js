@@ -432,7 +432,7 @@ app.put("/studentdata/:id", (req, res) => {
     // this params represent /books
     const bookId = req.params.id;
     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `divi`=?, `standard`=?, `bookName`=?, quantity=?, `currentDate`=?, `lastDate`=? , `status`=?  WHERE id=?"
+    const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `divi`=?, `standard`=?, `bookName`=?, quantity=?, `status`=? , `currentDate`=?, `lastDate`=?   WHERE id=?"
 
 
     const values = [
@@ -441,7 +441,7 @@ app.put("/studentdata/:id", (req, res) => {
         req.body.divi, // we are reading "div" from frontend
         req.body.standard,
         req.body.bookName,
-        req.body.quantity || 1,
+        req.body.quantity ,
         req.body.status, // Added
         req.body.currentDate,
         req.body.lastDate,
