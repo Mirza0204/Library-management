@@ -68,9 +68,9 @@ function Updatestudent() {
         standard: "",
         divi: "",
         bookName: "",
+        status: "", // Default status
         currentDate: "",
         lastDate: "",
-        status: "", // Default status
     });
     console.log(student, "checkingvalue is coming");
 
@@ -117,10 +117,10 @@ function Updatestudent() {
                 if (selectedBook) {
                     setStudent({
                         studentName: selectedBook.studentName,
-                        bookName: selectedBook.bookName,
                         rollNo: selectedBook.rollNo,
                         standard: selectedBook.standard,
                         divi: selectedBook.divi,
+                        bookName: selectedBook.bookName,
                         status: selectedBook.status,
                         // currentDate: selectedBook.currentDate,
                         // lastDate: selectedBook.lastDate,
