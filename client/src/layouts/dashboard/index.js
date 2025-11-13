@@ -187,7 +187,8 @@ function Dashboard() {
                       {/* {book.cover && <img src={book.cover} alt='' />} */}
                       {book.cover && (
                         <img
-                          src={`https://library-management-s4mr.onrender.com/${book.cover}`}
+                          // src={`https://library-management-s4mr.onrender.com/${book.cover}`}
+                            src={`https://library-management-s4mr.onrender.com${book.cover.startsWith("/") ? book.cover : "/" + book.cover}`}
                           alt={book.title}
                           style={{
                             width: "120px",

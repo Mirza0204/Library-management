@@ -109,7 +109,8 @@ function Billing() {
             price: selectedBook.price,
             cover: selectedBook.cover,
           });
-          setPreviewUrl(`${BASE_URL}${selectedBook.cover}`);
+          // setPreviewUrl(`${BASE_URL}${selectedBook.cover}`);
+          setPreviewUrl(`${BASE_URL}${selectedBook.cover.startsWith("/") ? selectedBook.cover : "/" + selectedBook.cover}`);
         }
       } catch (err) {
         console.error("Error fetching book:", err);
