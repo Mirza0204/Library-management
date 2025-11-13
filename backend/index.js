@@ -5,6 +5,14 @@ import mysql from "mysql2";
 
 import dotenv from "dotenv";
 
+
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dotenv.config(); // Load .env variables
 
 const app = express()
@@ -35,6 +43,25 @@ db.connect((err) => {
 
 app.use(express.json())
 app.use(cors())
+
+// Make sure 'uploads' folder exists in the same dir as this file
+// Serve uploaded files statically at /uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Multer storage config
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, "uploads")); // save files in /uploads
+    },
+    filename: function (req, file, cb) {
+        // include timestamp to avoid collisions
+        const uniqueName = Date.now() + "-" + file.originalname.replace(/\s+/g, "-");
+        cb(null, uniqueName);
+    }
+});
+const upload = multer({ storage });
+
+
 
 // if there is auth problem
 // AFTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin123'
@@ -241,25 +268,56 @@ app.put("/changepasswordlibrary", (req, res) => {
 // ----------------------------------------------------------
 // librarybooks
 // ----------------------------------------------------------
-app.post("/librarybooks", (req, res) => {
-    const q = "INSERT INTO librarybooks (`title`, `standard`  , `description`, `price`, `cover` , `quantity`) VALUES (?)";
-    const values = [
-        req.body.title,
-        req.body.standard,
-        req.body.description,
-        req.body.price,
-        req.body.cover,
-        req.body.quantity || 0
-    ];
+// app.post("/librarybooks", (req, res) => {
+//     const q = "INSERT INTO librarybooks (`title`, `standard`  , `description`, `price`, `cover` , `quantity`) VALUES (?)";
+//     const values = [
+//         req.body.title,
+//         req.body.standard,
+//         req.body.description,
+//         req.body.price,
+//         req.body.cover,
+//         req.body.quantity || 0
+//     ];
 
-    db.query(q, [values], (err, data) => {
-        if (err) {
-            console.error("❌ SQL Insert Error:", err);
-            return res.status(500).json({ message: "Database Insert Failed", error: err });
-        }
-        console.log("✅ Book Added:", values);
-        return res.json({ success: true, data });
-    });
+//     db.query(q, [values], (err, data) => {
+//         if (err) {
+//             console.error("❌ SQL Insert Error:", err);
+//             return res.status(500).json({ message: "Database Insert Failed", error: err });
+//         }
+//         console.log("✅ Book Added:", values);
+//         return res.json({ success: true, data });
+//     });
+// });
+
+
+// === POST route that accepts an image ===
+// Note: field name must match form data key (we'll use "cover")
+app.post("/librarybooks", upload.single("cover"), (req, res) => {
+    try {
+        // If multer saved file, req.file will exist
+        const coverPath = req.file ? `uploads/${req.file.filename}` : req.body.cover || null;
+
+        const q = "INSERT INTO librarybooks (`title`, `standard`, `description`, `price`, `cover`, `quantity`) VALUES (?)";
+        const values = [
+            req.body.title || null,
+            req.body.standard || null,
+            req.body.description || null,
+            req.body.price || null,
+            coverPath,                    // store relative path like 'uploads/1669...-img.jpg'
+            req.body.quantity || 0
+        ];
+
+        db.query(q, [values], (err, data) => {
+            if (err) {
+                console.error("SQL Insert Error:", err);
+                return res.status(500).json({ message: "Database Insert Failed", error: err });
+            }
+            return res.json({ success: true, data });
+        });
+    } catch (err) {
+        console.error("Upload error:", err);
+        return res.status(500).json({ message: "Server error", error: err });
+    }
 });
 // --------------------------------------------
 
@@ -441,7 +499,7 @@ app.put("/studentdata/:id", (req, res) => {
         req.body.divi, // we are reading "div" from frontend
         req.body.standard,
         req.body.bookName,
-        req.body.quantity ,
+        req.body.quantity,
         req.body.status, // Added
         req.body.currentDate,
         req.body.lastDate,

@@ -49,7 +49,7 @@ function Dashboard() {
       try {
         // const res = await axios.get("http://localhost:8800/books")
         const res = await axios.get("https://library-management-s4mr.onrender.com/librarybooks")
-        console.log(res.data , "librarybooks" );
+        console.log(res.data, "librarybooks");
         setBooks(res.data);
       } catch (err) {
         console.log(err);
@@ -61,8 +61,8 @@ function Dashboard() {
 
   // ---------------------------- Delete Funcation
   const handleDelete = async (id) => {
-    console.log( "deleteid" , id);
-    
+    console.log("deleteid", id);
+
     try {
       // await axios.delete("http://localhost:8800/books/" + id)
       await axios.delete("https://library-management-s4mr.onrender.com/librarybooks/" + id)
@@ -184,12 +184,25 @@ function Dashboard() {
                 <div className="dashboard-books" >
                   {books.map((book) => (
                     <div className="dashboard-book-child" key={book.id}>
-                      {book.cover && <img src={book.cover} alt='' />}
+                      {/* {book.cover && <img src={book.cover} alt='' />} */}
+                      {book.cover && (
+                        <img
+                          src={`https://library-management-s4mr.onrender.com/${book.cover}`}
+                          alt={book.title}
+                          style={{
+                            width: "120px",
+                            height: "120px",
+                            objectFit: "cover",
+                            borderRadius: "10px",
+                            marginBottom: "10px"
+                          }}
+                        />
+                      )}
                       <h2>Book Name: {book.title}</h2>
                       <h4>Std: {book.standard}</h4>
                       <p>{book.description}</p>
                       <span>💸: {book.price}/-Rs</span>
-                      <p style={{margin: "0 8px"}}> In library Avaiable: {book.quantity}</p>
+                      <p style={{ margin: "0 8px" }}> In library Avaiable: {book.quantity}</p>
 
                       <div className="dashboard-delup-btn">
                         <button className='delete' onClick={() => handleDelete(book.id)}>Delete</button>

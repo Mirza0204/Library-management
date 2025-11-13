@@ -22,6 +22,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import "../tables/tables.css"
 
+const BASE_URL = "https://library-management-s4mr.onrender.com"; // change if needed
+
+
 
 function Addnewbook() {
     const { columns, rows } = authorsTableData();
@@ -31,7 +34,7 @@ function Addnewbook() {
         standard: "",
         description: "",
         price: null,
-        cover: "",
+        // cover: "",
         quantity: 0
     });
 
@@ -54,6 +57,8 @@ function Addnewbook() {
 
     // handleChange unchanged
     const navigate = useNavigate()
+    const [coverFile, setCoverFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
 
     // const handleChange = (e) => {
     //     setBook(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -68,26 +73,66 @@ function Addnewbook() {
         }
     };
 
+
+    const handleFileChange = (e) => {
+        const file = e.target.files?.[0] || null;
+        setCoverFile(file);
+        if (file) {
+            setPreviewUrl(URL.createObjectURL(file)); // for preview
+        } else {
+            setPreviewUrl(null);
+        }
+    };
+
+
+
+
+
     console.log(book, "checkingvalue is coming");
 
-    const handleClick = async e => {
-        e.preventDefault()
+    // const handleClick = async e => {
+    //     e.preventDefault()
 
-        // sanitize numeric fields
-        const payload = {
-            ...book,
-            price: book.price === "" ? null : Number(book.price),
-            quantity: Number(book.quantity) || 0,
-        };
+    //     // sanitize numeric fields
+    //     const payload = {
+    //         ...book,
+    //         price: book.price === "" ? null : Number(book.price),
+    //         quantity: Number(book.quantity) || 0,
+    //     };
+
+    //     try {
+    //         // await axios.post("http://localhost:8800/books", book)
+    //         await axios.post("https://library-management-s4mr.onrender.com/librarybooks", payload)
+    //         navigate("/dashboard")
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // }
+
+    const handleClick = async (e) => {
+        e.preventDefault();
+
+        // Build FormData
+        const formData = new FormData();
+        formData.append("title", book.title);
+        formData.append("standard", book.standard);
+        formData.append("description", book.description);
+        formData.append("price", book.price === "" ? null : book.price);
+        formData.append("quantity", book.quantity || 0);
+
+        if (coverFile) {
+            formData.append("cover", coverFile); // key 'cover' matches upload.single("cover")
+        }
 
         try {
-            // await axios.post("http://localhost:8800/books", book)
-            await axios.post("https://library-management-s4mr.onrender.com/librarybooks", payload)
-            navigate("/dashboard")
+            await axios.post(`${BASE_URL}/librarybooks`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            navigate("/dashboard");
         } catch (err) {
-            console.log(err);
+            console.log("Upload error:", err);
         }
-    }
+    };
 
     // -------------------------------------------------------------------
     // -------------------------------------------------------------------
@@ -126,7 +171,19 @@ function Addnewbook() {
 
                             <div className="table-form-inputto">
                                 <input className="tables-input-child" type="number" placeholder='price' onChange={handleChange} name='price' />
-                                <input className="tables-input-child" type="text" placeholder='cover' onChange={handleChange} name='cover' />
+
+
+                                {/* <input className="tables-input-child" type="text" placeholder='cover' onChange={handleChange} name='cover' /> */}
+
+                                {/* file input */}
+                                <input type="file" accept="image/*" onChange={handleFileChange} />
+
+                                {/* preview (optional) */}
+                                {previewUrl && (
+                                    <div style={{ marginTop: 10 }}>
+                                        <img src={previewUrl} alt="preview" style={{ width: 120, height: 120, objectFit: "cover" }} />
+                                    </div>
+                                )}
 
                             </div>
                             <div className="tables-form-btn">
