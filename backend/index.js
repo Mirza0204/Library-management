@@ -44,23 +44,6 @@ db.connect((err) => {
 app.use(express.json())
 app.use(cors())
 
-// Make sure 'uploads' folder exists in the same dir as this file
-// Serve uploaded files statically at /uploads
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Multer storage config
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "uploads")); // save files in /uploads
-    },
-    filename: function (req, file, cb) {
-        // include timestamp to avoid collisions
-        const uniqueName = Date.now() + "-" + file.originalname.replace(/\s+/g, "-");
-        cb(null, uniqueName);
-    }
-});
-const upload = multer({ storage });
-
 
 
 // if there is auth problem
@@ -292,33 +275,82 @@ app.put("/changepasswordlibrary", (req, res) => {
 
 // === POST route that accepts an image ===
 // Note: field name must match form data key (we'll use "cover")
-app.post("/librarybooks", upload.single("cover"), (req, res) => {
-    try {
-        // If multer saved file, req.file will exist
-        const coverPath = req.file ? `uploads/${req.file.filename}` : req.body.cover || null;
+// app.post("/librarybooks", upload.single("cover"), (req, res) => {
+//     try {
+//         // If multer saved file, req.file will exist
+//         const coverPath = req.file ? `uploads/${req.file.filename}` : req.body.cover || null;
 
-        const q = "INSERT INTO librarybooks (`title`, `standard`, `description`, `price`, `cover`, `quantity`) VALUES (?)";
-        const values = [
-            req.body.title || null,
-            req.body.standard || null,
-            req.body.description || null,
-            req.body.price || null,
-            coverPath,                    // store relative path like 'uploads/1669...-img.jpg'
-            req.body.quantity || 0
-        ];
+//         const q = "INSERT INTO librarybooks (`title`, `standard`, `description`, `price`, `cover`, `quantity`) VALUES (?)";
+//         const values = [
+//             req.body.title || null,
+//             req.body.standard || null,
+//             req.body.description || null,
+//             req.body.price || null,
+//             coverPath,                    // store relative path like 'uploads/1669...-img.jpg'
+//             req.body.quantity || 0
+//         ];
 
-        db.query(q, [values], (err, data) => {
-            if (err) {
-                console.error("SQL Insert Error:", err);
-                return res.status(500).json({ message: "Database Insert Failed", error: err });
-            }
-            return res.json({ success: true, data });
-        });
-    } catch (err) {
-        console.error("Upload error:", err);
-        return res.status(500).json({ message: "Server error", error: err });
-    }
+//         db.query(q, [values], (err, data) => {
+//             if (err) {
+//                 console.error("SQL Insert Error:", err);
+//                 return res.status(500).json({ message: "Database Insert Failed", error: err });
+//             }
+//             return res.json({ success: true, data });
+//         });
+//     } catch (err) {
+//         console.error("Upload error:", err);
+//         return res.status(500).json({ message: "Server error", error: err });
+//     }
+// });
+
+
+// Make sure 'uploads' folder exists in the same dir as this file
+// Serve uploaded files statically at /uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
+const uploadDir = path.join(__dirname, "uploads");
+
+// ✅ Ensure uploads folder exists (important for Render)
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir); // upload destination
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + file.originalname;
+        cb(null, uniqueSuffix);
+    },
 });
+
+const upload = multer({ storage });
+
+
+app.post("/librarybooks", upload.single("cover"), (req, res) => {
+    const file = req.file;
+    const coverPath = file ? `uploads/${file.filename}` : null;
+
+    const { title, standard, description, price, quantity } = req.body;
+
+    const q = `
+    INSERT INTO librarybooks (title, standard, description, price, cover, quantity)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+    const values = [title, standard, description, price, coverPath, quantity];
+
+    db.query(q, values, (err, data) => {
+        if (err) {
+            console.error("SQL Insert Error:", err);
+            return res.status(500).json({ message: "Database Insert Failed", error: err });
+        }
+        res.json({ success: true, message: "Book added successfully!" });
+    });
+});
+
 // --------------------------------------------
 
 app.get("/librarybooks", (req, res) => {
