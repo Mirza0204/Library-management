@@ -36,16 +36,21 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../billing/billing.css"
 
+
+const BASE_URL = "https://library-management-s4mr.onrender.com";
+
 function Billing() {
   const [bookLibrary, setBookLibrary] = useState({
     title: "",
     standard: "",
-    quantity:0,
+    quantity: 0,
     description: "",
     price: "",
     cover: ""
   });
 
+  const [newCoverFile, setNewCoverFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -63,12 +68,38 @@ function Billing() {
 
   // ---------------------------------------
   //  Fetch book details when component loads
+  // useEffect(() => {
+  //   const fetchBook = async () => {
+  //     try {
+  //       const res = await axios.get(`https://library-management-s4mr.onrender.com/librarybooks`);
+  //       // find the specific book by ID
+  //       const selectedBook = res.data.find((b) => b.id === parseInt(bookId));
+  //       if (selectedBook) {
+  //         setBookLibrary({
+  //           title: selectedBook.title,
+  //           standard: selectedBook.standard,
+  //           quantity: selectedBook.quantity,
+  //           description: selectedBook.description,
+  //           price: selectedBook.price,
+  //           cover: selectedBook.cover,
+  //         });
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching book details:", err);
+  //     }
+  //   };
+  //   fetchBook();
+  // }, [bookId]);
+
+  // Fetch book details
+
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const res = await axios.get(`https://library-management-s4mr.onrender.com/librarybooks`);
-        // find the specific book by ID
-        const selectedBook = res.data.find((b) => b.id === parseInt(bookId));
+        const res = await axios.get(`${BASE_URL}/librarybooks`);
+        const selectedBook = res.data.find(
+          (b) => b.id === parseInt(bookId)
+        );
         if (selectedBook) {
           setBookLibrary({
             title: selectedBook.title,
@@ -78,27 +109,64 @@ function Billing() {
             price: selectedBook.price,
             cover: selectedBook.cover,
           });
+          setPreviewUrl(`${BASE_URL}${selectedBook.cover}`);
         }
       } catch (err) {
-        console.error("Error fetching book details:", err);
+        console.error("Error fetching book:", err);
       }
     };
     fetchBook();
   }, [bookId]);
+
+
   //  Fetch book details when component loads
   // ---------------------------------------
 
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    setNewCoverFile(file);
+    if (file) setPreviewUrl(URL.createObjectURL(file));
+  };
+
+
+
   // ------------Update API Condition
-  const handleClick = async e => {
-    e.preventDefault()
-    try {
-      await axios.put(`https://library-management-s4mr.onrender.com/librarybooks/${bookId}`, bookLibrary)
-      navigate("/dashboard")
-    } catch (err) {
-      console.log(err);
+  // const handleClick = async e => {
+  //   e.preventDefault()
+  //   try {
+  //     await axios.put(`https://library-management-s4mr.onrender.com/librarybooks/${bookId}`, bookLibrary)
+  //     navigate("/dashboard")
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", bookLibrary.title);
+    formData.append("standard", bookLibrary.standard);
+    formData.append("description", bookLibrary.description);
+    formData.append("price", bookLibrary.price);
+    formData.append("quantity", bookLibrary.quantity);
+
+    if (newCoverFile) {
+      formData.append("cover", newCoverFile);
+    } else {
+      formData.append("cover", bookLibrary.cover); // keep old image
     }
-  }
+
+    try {
+      await axios.put(`${BASE_URL}/librarybooks/${bookId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Update error:", err);
+    }
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
@@ -169,8 +237,30 @@ function Billing() {
               <div className="table-form-inputto">
                 <input className="billing-input-child" type="number" placeholder='price'
                   value={bookLibrary.price} onChange={handleChange} name='price' />
-                <input className="billing-input-child" type="text" placeholder='cover'
-                  value={bookLibrary.cover} onChange={handleChange} name='cover' />
+
+
+                {/* <input className="billing-input-child" type="text" placeholder='cover'
+                  value={bookLibrary.cover} onChange={handleChange} name='cover' /> */}
+
+                {/* File Input + Preview */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+
+                {previewUrl && (
+                  <img
+                    src={previewUrl}
+                    alt="preview"
+                    style={{
+                      marginTop: 10,
+                      width: 120,
+                      height: 120,
+                      objectFit: "cover",
+                    }}
+                  />
+                )}
               </div>
 
               <div className="billing-form-btn">

@@ -363,28 +363,58 @@ app.get("/librarybooks", (req, res) => {
 })
 
 //--------------- Update condition ---------------
-app.put("/librarybooks/:id", (req, res) => {
-    // this params represent /books
-    const bookId = req.params.id;
-    // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-    // const q = "UPDATE librarybooks SET `title` =?, `standard` =? , `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
-    const q = "UPDATE librarybooks SET `title`=?, `standard`=?, `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?";
+// app.put("/librarybooks/:id", (req, res) => {
+//     // this params represent /books
+//     const bookId = req.params.id;
+//     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
+//     // const q = "UPDATE librarybooks SET `title` =?, `standard` =? , `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?"
+//     const q = "UPDATE librarybooks SET `title`=?, `standard`=?, `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?";
 
+
+//     const values = [
+//         req.body.title,
+//         req.body.standard,
+//         req.body.description,
+//         req.body.price,
+//         req.body.cover,
+//         req.body.quantity || 0
+//     ]
+
+//     db.query(q, [...values, bookId], (err, data) => {
+//         if (err) return res.json(err)
+//         return res.json("librarybooks has been Updated Succesfully")
+//     })
+// })
+
+// ✅ PUT with image
+app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
+    const bookId = req.params.id;
+
+    // If a new file is uploaded, use its path. Otherwise keep existing cover.
+    let coverPath = req.file
+        ? `/uploads/${req.file.filename}`
+        : req.body.cover;
+
+    const q =
+        "UPDATE librarybooks SET `title`=?, `standard`=?, `description`=?, `price`=?, `cover`=?, `quantity`=? WHERE id=?";
 
     const values = [
         req.body.title,
         req.body.standard,
         req.body.description,
         req.body.price,
-        req.body.cover,
-        req.body.quantity || 0
-    ]
+        coverPath,
+        req.body.quantity || 0,
+    ];
 
     db.query(q, [...values, bookId], (err, data) => {
-        if (err) return res.json(err)
-        return res.json("librarybooks has been Updated Succesfully")
-    })
-})
+        if (err) {
+            console.log("SQL Update Error:", err);
+            return res.status(500).json({ error: "Update failed", details: err });
+        }
+        res.json({ message: "Book updated successfully" });
+    });
+});
 //--------------- Update condition ---------------
 
 
