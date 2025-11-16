@@ -211,17 +211,39 @@ function Tables() {
     }
 
     // Build clean payload
+    // const payload = {
+    //   studentName: student.studentName,
+    //   rollNo: student.rollNo,
+    //   divi: student.divi,
+    //   standard: student.standard,
+    //   bookName: student.bookName,
+    //   quantity: Number(takeQuantity),
+    //   currentDate: student.currentDate,
+    //   lastDate: student.lastDate,
+    //   status: student.status || "Pending"
+    // };
+
     const payload = {
       studentName: student.studentName,
       rollNo: student.rollNo,
       divi: student.divi,
       standard: student.standard,
+
+      // 👍 ALL BOOK SLOTS
       bookName: student.bookName,
-      quantity: Number(takeQuantity),
+      quantity: Number(student.quantity),
+
+      bookName2: student.bookName2,
+      quantity2: Number(student.quantity2),
+
+      bookName3: student.bookName3,
+      quantity3: Number(student.quantity3),
+
       currentDate: student.currentDate,
       lastDate: student.lastDate,
       status: student.status || "Pending"
     };
+
 
     console.log("Sending student POST payload:", payload);
 
@@ -240,12 +262,42 @@ function Tables() {
       }
 
       // decrement book count
-      await axios.post(`https://library-management-s4mr.onrender.com/librarybooks/${selectedBook.id}/decrement`, {
-        quantity: Number(takeQuantity)
-      });
+      // await axios.post(`https://library-management-s4mr.onrender.com/librarybooks/${selectedBook.id}/decrement`, {
+      //   quantity: Number(takeQuantity)
+      // });
+
+      // 🟢 BOOK 1
+      if (student.bookName && student.quantity > 0) {
+        const book1 = tableBooks.find(b => b.title === student.bookName);
+        if (book1) {
+          await axios.post(`https://library-management-s4mr.onrender.com/librarybooks/${book1.id}/decrement`, {
+            quantity: Number(student.quantity)
+          });
+        }
+      }
+
+      // 🟢 BOOK 2
+      if (student.bookName2 && student.quantity2 > 0) {
+        const book2 = tableBooks.find(b => b.title === student.bookName2);
+        if (book2) {
+          await axios.post(`https://library-management-s4mr.onrender.com/librarybooks/${book2.id}/decrement`, {
+            quantity: Number(student.quantity2)
+          });
+        }
+      }
+
+      // 🟢 BOOK 3
+      if (student.bookName3 && student.quantity3 > 0) {
+        const book3 = tableBooks.find(b => b.title === student.bookName3);
+        if (book3) {
+          await axios.post(`https://library-management-s4mr.onrender.com/librarybooks/${book3.id}/decrement`, {
+            quantity: Number(student.quantity3)
+          });
+        }
+      }
 
       alert("✅ Student added successfully!");
-      window.location.reload()
+      // window.location.reload()
     } catch (err) {
       console.error("Error adding student:", err);
       alert("❌ Failed to add student");
@@ -263,8 +315,11 @@ function Tables() {
 
   const handlestudentdata = (e) => {
     const { name, value } = e.target;
-    setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
+    // setStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setStudent(prev => ({
+      ...prev,
+      [name]: value
+    }));
     // 👇 When standard changes, filter books dynamically
     if (name === "standard") {
       const filtered = tableBooks.filter((book) => book.standard === value);
@@ -517,7 +572,9 @@ function Tables() {
 
 
 
-                    {student.bookName && student.quantity > 0 && (
+                    {/* 2 */}
+                    {/* {student.bookName && student.quantity > 0 && ( */}
+                    {student.bookName && (
                       <div className="Student-form-input">
 
                         <select
@@ -560,6 +617,7 @@ function Tables() {
                     )}
 
 
+                    {/* 3 */}
                     {student.bookName2 && student.quantity2 > 0 && (
                       <div className="Student-form-input">
 

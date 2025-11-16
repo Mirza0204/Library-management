@@ -69,6 +69,10 @@ function Updatestudent() {
         divi: "",
         bookName: "",
         quantity: "",
+        bookName2: "",
+        quantity2: "",
+        bookName3: "",
+        quantity3: "",
         status: "", // Default status
         currentDate: "",
         lastDate: "",
@@ -102,7 +106,17 @@ function Updatestudent() {
         e.preventDefault();
 
         try {
-            const { quantity, receivedQuantity, status, bookName, standard } = student;
+            const {
+                bookName, quantity, standard,
+                bookName2, quantity2,
+                bookName3, quantity3,
+                status
+            } = student;
+
+            // Ye teen received quantities input se aa rahi hain
+            const received1 = Number(student.receivedQuantity1 || 0);
+            const received2 = Number(student.receivedQuantity2 || 0);
+            const received3 = Number(student.receivedQuantity3 || 0);
 
             // Step 1: Update student data
             await axios.put(
@@ -110,28 +124,52 @@ function Updatestudent() {
                 student
             );
 
-            // Step 2: Agar kuch books wapas ki gayi (receivedQuantity > 0)
-            if (receivedQuantity > 0) {
+            // Step 2: Book 1
+            if (received1 > 0 && bookName) {
                 const selectedBook = tableBooks.find(
                     (b) => b.title === bookName && b.standard === standard
                 );
-
                 if (selectedBook) {
-                    // Step 3: Update librarybooks quantity (+receivedQuantity)
                     await axios.post(
                         `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook.id}/increment`,
-                        { quantity: Number(receivedQuantity) }
+                        { quantity: received1 }
+                    );
+                }
+            }
+
+            // Step 3: Book 2
+            if (received2 > 0 && bookName2) {
+                const selectedBook2 = tableBooks.find(
+                    (b) => b.title === bookName2 && b.standard === standard
+                );
+                if (selectedBook2) {
+                    await axios.post(
+                        `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook2.id}/increment`,
+                        { quantity2: received2 }
+                    );
+                }
+            }
+
+            // Step 4: Book 3
+            if (received3 > 0 && bookName3) {
+                const selectedBook3 = tableBooks.find(
+                    (b) => b.title === bookName3 && b.standard === standard
+                );
+                if (selectedBook3) {
+                    await axios.post(
+                        `https://library-management-s4mr.onrender.com/librarybooks/${selectedBook3.id}/increment`,
+                        { quantity3: received3 }
                     );
                 }
             }
 
             // Step 4: Agar ab quantity == 0 hai toh status automatically Received kar do
-            if (Number(quantity) === 0 && status !== "Received") {
-                await axios.put(
-                    `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
-                    { ...student, status: "Received" }
-                );
-            }
+            // if (Number(quantity) === 0 && status !== "Received") {
+            //     await axios.put(
+            //         `https://library-management-s4mr.onrender.com/studentdata/${StudentId}`,
+            //         { ...student, status: "Received" }
+            //     );
+            // }
 
             alert("✅ Student & Library data updated successfully!");
         } catch (err) {
@@ -158,23 +196,44 @@ function Updatestudent() {
                 const res = await axios.get("https://library-management-s4mr.onrender.com/studentdata")
                 // find the specific book by ID
                 const selectedBook = res.data.find((b) => b.id === parseInt(StudentId));
+                // if (selectedBook) {
+                //     setStudent({
+                //         studentName: selectedBook.studentName,
+                //         rollNo: selectedBook.rollNo,
+                //         standard: selectedBook.standard,
+                //         divi: selectedBook.divi,
+                //         bookName: selectedBook.bookName,
+                //         quantity: selectedBook.quantity,
+                //         status: selectedBook.status,
+                //         // currentDate: selectedBook.currentDate,
+                //         // lastDate: selectedBook.lastDate,
+                //         currentDate: selectedBook.currentDate
+                //             ? selectedBook.currentDate.split("T")[0]
+                //             : "",
+                //         lastDate: selectedBook.lastDate
+                //             ? selectedBook.lastDate.split("T")[0]
+                //             : "",
+                //     });
+                // }
                 if (selectedBook) {
                     setStudent({
                         studentName: selectedBook.studentName,
                         rollNo: selectedBook.rollNo,
                         standard: selectedBook.standard,
                         divi: selectedBook.divi,
+
                         bookName: selectedBook.bookName,
                         quantity: selectedBook.quantity,
-                        status: selectedBook.status,
-                        // currentDate: selectedBook.currentDate,
-                        // lastDate: selectedBook.lastDate,
-                        currentDate: selectedBook.currentDate
-                            ? selectedBook.currentDate.split("T")[0]
-                            : "",
-                        lastDate: selectedBook.lastDate
-                            ? selectedBook.lastDate.split("T")[0]
-                            : "",
+
+                        bookName2: selectedBook.bookName2,
+                        quantity2: selectedBook.quantity2,
+
+                        bookName3: selectedBook.bookName3,
+                        quantity3: selectedBook.quantity3,
+
+                        currentDate: selectedBook.currentDate ? selectedBook.currentDate.split("T")[0] : "",
+                        lastDate: selectedBook.lastDate ? selectedBook.lastDate.split("T")[0] : "",
+                        status: selectedBook.status
                     });
                 }
             } catch (err) {
@@ -252,38 +311,110 @@ function Updatestudent() {
 
                                 <div className="Student-form-input">
                                     {/* Dropdown for Book Name */}
-                                    <select
-                                        className="tables-input-child"
-                                        name="bookName"
-                                        onChange={handlestudentdata}
-                                        value={student.bookName}
-                                    >
-                                        <option value="">Select Book</option>
-                                        {tableBooks.map((book) => (
-                                            <option key={book.id} value={book.title}>
-                                                {book.title}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div>
+                                        {/* BOOK 1 */}
+                                        <div>
+                                            <select
+                                                className="tables-input-child"
+                                                name="bookName"
+                                                onChange={handlestudentdata}
+                                                value={student.bookName}
+                                            >
+                                                <option value="">Select Book</option>
+                                                {tableBooks.map((book) => (
+                                                    <option key={book.id} value={book.title}>
+                                                        {book.title}
+                                                    </option>
+                                                ))}
+                                            </select>
 
-                                    {/* ✅ Quantity input */}
-                                    <input
-                                        className="tables-input-child"
-                                        type="number"
-                                        placeholder="Enter Quantity"
-                                        name="quantity"
-                                        value={student.quantity}
-                                        onChange={handlestudentdata}
-                                    />
+                                            <input
+                                                className="tables-input-child"
+                                                type="number"
+                                                placeholder="Enter Quantity"
+                                                name="quantity"
+                                                value={student.quantity}
+                                                onChange={handlestudentdata}
+                                            />
 
-                                    <input
-                                        className="tables-input-child"
-                                        type="number"
-                                        placeholder="Books Received Now"
-                                        name="receivedQuantity"
-                                        value={student.receivedQuantity || ""}
-                                        onChange={handlestudentdata}
-                                    />
+                                            <input
+                                                className="tables-input-child"
+                                                type="number"
+                                                placeholder="Books Received (Book 1)"
+                                                name="receivedQuantity1"
+                                                onChange={handlestudentdata}
+                                            />
+                                        </div>
+
+                                        {/* BOOK 2 */}
+                                        <div>
+                                            <select
+                                                className="tables-input-child"
+                                                name="bookName2"
+                                                onChange={handlestudentdata}
+                                                value={student.bookName2}
+                                            >
+                                                <option value="">Select Book</option>
+                                                {tableBooks.map((book) => (
+                                                    <option key={book.id} value={book.title}>
+                                                        {book.title}
+                                                    </option>
+                                                ))}
+                                            </select>
+
+                                            <input
+                                                className="tables-input-child"
+                                                type="number"
+                                                placeholder="Enter Quantity"
+                                                name="quantity2"
+                                                value={student.quantity2}
+                                                onChange={handlestudentdata}
+                                            />
+
+                                            <input
+                                                className="tables-input-child"
+                                                type="number"
+                                                placeholder="Books Received (Book 2)"
+                                                name="receivedQuantity2"
+                                                onChange={handlestudentdata}
+                                            />
+                                        </div>
+
+                                        {/* BOOK 3 */}
+                                        <div>
+                                            <select
+                                                className="tables-input-child"
+                                                name="bookName3"
+                                                onChange={handlestudentdata}
+                                                value={student.bookName3}
+                                            >
+                                                <option value="">Select Book</option>
+                                                {tableBooks.map((book) => (
+                                                    <option key={book.id} value={book.title}>
+                                                        {book.title}
+                                                    </option>
+                                                ))}
+                                            </select>
+
+                                            <input
+                                                className="tables-input-child"
+                                                type="number"
+                                                placeholder="Enter Quantity"
+                                                name="quantity3"
+                                                value={student.quantity3}
+                                                onChange={handlestudentdata}
+                                            />
+
+                                            <input
+                                                className="tables-input-child"
+                                                type="number"
+                                                placeholder="Books Received (Book 3)"
+                                                name="receivedQuantity3"
+                                                onChange={handlestudentdata}
+                                            />
+                                        </div>
+                                    </div>
+
 
 
                                     <select
