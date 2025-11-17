@@ -254,61 +254,6 @@ app.put("/changepasswordlibrary", (req, res) => {
 
 
 // ----------------------------------------------------------
-// Bulkupload
-// ----------------------------------------------------------
-app.post("/bulkupload", upload.single("file"), (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: "No Excel file uploaded" });
-        }
-
-        // Step 1: Read uploaded Excel file
-        const workbook = XLSX.readFile(req.file.path);
-        const sheetName = workbook.SheetNames[0];
-        const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-
-        console.log("EXCEL DATA:", sheetData);
-
-        // Step 2: Insert all rows into DB
-        const insertQuery = `
-            INSERT INTO librarybooks 
-            (title, standard, description, price, cover, quantity)
-            VALUES ?
-        `;
-
-        const values = sheetData.map(row => [
-            row.title || null,
-            row.standard || null,
-            row.description || null,
-            row.price || null,
-            row.cover || null,
-            row.quantity || 0
-        ]);
-
-        db.query(insertQuery, [values], (err, data) => {
-            if (err) {
-                console.log("Bulk Upload SQL Error:", err);
-                return res.status(500).json({ message: "Insert failed", error: err });
-            }
-
-            return res.json({
-                success: true,
-                message: `${values.length} books uploaded successfully`,
-            });
-        });
-
-    } catch (error) {
-        console.error("Bulk Upload Error:", error);
-        return res.status(500).json({ message: "Error processing file", error });
-    }
-});
-
-// ----------------------------------------------------------
-// Bulkupload
-// ----------------------------------------------------------
-
-
-// ----------------------------------------------------------
 // librarybooks
 // ----------------------------------------------------------
 
@@ -659,6 +604,62 @@ app.get("/librarybooks/:id/decrement", (req, res) => {
 // ------------------------------------------------------------------
 // librarybooks
 // ------------------------------------------------------------------
+
+
+
+// ----------------------------------------------------------
+// Bulkupload
+// ----------------------------------------------------------
+app.post("/bulkupload", upload.single("file"), (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No Excel file uploaded" });
+        }
+
+        // Step 1: Read uploaded Excel file
+        const workbook = XLSX.readFile(req.file.path);
+        const sheetName = workbook.SheetNames[0];
+        const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+        console.log("EXCEL DATA:", sheetData);
+
+        // Step 2: Insert all rows into DB
+        const insertQuery = `
+            INSERT INTO librarybooks 
+            (title, standard, description, price, cover, quantity)
+            VALUES ?
+        `;
+
+        const values = sheetData.map(row => [
+            row.title || null,
+            row.standard || null,
+            row.description || null,
+            row.price || null,
+            row.cover || null,
+            row.quantity || 0
+        ]);
+
+        db.query(insertQuery, [values], (err, data) => {
+            if (err) {
+                console.log("Bulk Upload SQL Error:", err);
+                return res.status(500).json({ message: "Insert failed", error: err });
+            }
+
+            return res.json({
+                success: true,
+                message: `${values.length} books uploaded successfully`,
+            });
+        });
+
+    } catch (error) {
+        console.error("Bulk Upload Error:", error);
+        return res.status(500).json({ message: "Error processing file", error });
+    }
+});
+
+// ----------------------------------------------------------
+// Bulkupload
+// ----------------------------------------------------------
 
 
 // ------------------------------------------------------------------
