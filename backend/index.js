@@ -331,7 +331,7 @@ app.post("/librarybooks", upload.single("cover"), (req, res) => {
         const q = `
             INSERT INTO librarybooks 
             (title, standard, description, price, cover, quantity)
-            VALUES (?)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
 
         const values = [
@@ -383,11 +383,26 @@ app.post("/librarybooks", upload.single("cover"), (req, res) => {
 });
 
 
+// app.get("/librarybooks", (req, res) => {
+//     const q = "SELECT * FROM librarybooks";
+//     db.query(q, (err, data) => {
+//         if (err) return res.json(err);
+//         res.json(data);
+//     });
+// });
+
 app.get("/librarybooks", (req, res) => {
     const q = "SELECT * FROM librarybooks";
+
     db.query(q, (err, data) => {
-        if (err) return res.json(err);
-        res.json(data);
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: "Failed to fetch books",
+                error: err
+            });
+        }
+        res.status(200).json(data);
     });
 });
 
