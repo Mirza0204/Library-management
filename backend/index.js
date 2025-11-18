@@ -643,7 +643,7 @@ app.post("/bulkupload", uploadExcel.single("file"), async (req, res) => {
 
         const fileBuffer = req.file.buffer;
 
-        // Cloudinary upload_stream ko promise me convert karna padega
+        // Upload Excel to Cloudinary (RAW file)
         const uploadToCloudinary = () => {
             return new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
@@ -660,29 +660,73 @@ app.post("/bulkupload", uploadExcel.single("file"), async (req, res) => {
             });
         };
 
-        // Wait for upload to finish
-        const result = await uploadToCloudinary();
-        console.log("Excel Uploaded:", result.secure_url);
+        const uploadResult = await uploadToCloudinary();
+        console.log("Excel Uploaded:", uploadResult.secure_url);
 
         // Read Excel from buffer
         const workbook = XLSX.read(fileBuffer, { type: "buffer" });
         const sheetName = workbook.SheetNames[0];
         const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-        console.log("Excel Parsed:", sheetData);
+        console.log("Parsed Excel:", sheetData);
 
-        // --- yahan DB insert karo ----
+        // Validation: empty excel
+        if (!sheetData.length) {
+            return res.status(400).json({ message: "Excel is empty" });
+        }
 
-        return res.status(200).json({
-            message: "Excel uploaded successfully!",
-            fileUrl: result.secure_url,
+        // Prepare values for bulk insert
+        const values = [];
+
+        for (const row of sheetData) {
+            if (!row.title || !row.standard || !row.price || !row.cover) {
+                return res.status(400).json({
+                    message: `Missing fields in row (title, standard, price, cover) for: ${row.title}`
+                });
+            }
+
+            values.push([
+                row.title || null,
+                row.standard || null,
+                row.description || "",
+                row.price || null,
+                row.cover,         // Cloudinary Image URL
+                row.quantity || 0,
+            ]);
+        }
+
+        // SQL Insert Query
+        const insertQuery = `
+            INSERT INTO librarybooks 
+            (title, standard, description, price, cover, quantity)
+            VALUES ?
+        `;
+
+        db.query(insertQuery, [values], (err, data) => {
+            if (err) {
+                console.log("SQL ERROR:", err.sqlMessage);
+                return res.status(500).json({
+                    message: "Insert failed",
+                    error: err
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: `${values.length} books uploaded successfully!`,
+                fileUrl: uploadResult.secure_url
+            });
         });
 
     } catch (error) {
-        console.log("Bulk upload error:", error);
-        return res.status(500).json({ error });
+        console.error("Bulk Upload Error:", error);
+        return res.status(500).json({
+            message: "Error processing file",
+            error
+        });
     }
 });
+
 
 
 
