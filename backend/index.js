@@ -637,34 +637,53 @@ const uploadExcel = multer({ storage: multer.memoryStorage() });
 
 app.post("/bulkupload", uploadExcel.single("file"), async (req, res) => {
     try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
         const fileBuffer = req.file.buffer;
 
-        // Upload Excel file to Cloudinary
-        const uploadResult = await cloudinary.uploader.upload_stream(
-            {
-                resource_type: "raw",
-                folder: "excel-files"
-            },
-            async (error, result) => {
-                if (error) return res.status(500).json({ error });
+        // Cloudinary upload_stream ko promise me convert karna padega
+        const uploadToCloudinary = () => {
+            return new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: "raw",
+                        folder: "excel-files",
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                stream.end(fileBuffer);
+            });
+        };
 
-                console.log("Excel Uploaded:", result.secure_url);
+        // Wait for upload to finish
+        const result = await uploadToCloudinary();
+        console.log("Excel Uploaded:", result.secure_url);
 
-                // Read buffer (NOT from disk)
-                const workbook = XLSX.read(fileBuffer, { type: "buffer" });
-                const sheetName = workbook.SheetNames[0];
-                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+        // Read Excel from buffer
+        const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+        const sheetName = workbook.SheetNames[0];
+        const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-                // Insert into DB...
-            }
-        );
+        console.log("Excel Parsed:", sheetData);
 
-        uploadResult.end(fileBuffer);
+        // --- yahan DB insert karo ----
+
+        return res.status(200).json({
+            message: "Excel uploaded successfully!",
+            fileUrl: result.secure_url,
+        });
 
     } catch (error) {
+        console.log("Bulk upload error:", error);
         return res.status(500).json({ error });
     }
 });
+
 
 
 
