@@ -649,53 +649,27 @@ app.post("/bulkupload", upload.single("file"), async (req, res) => {
         // Step 2: Loop through rows
         for (const row of sheetData) {
 
-            // ---------------------------
-            // 1️⃣ Google Drive URL → File ID
-            // ---------------------------
-            const driveUrl = row.cover;
+            // 🔥 ab Cloudinary URL Excel se aayega
+            const cloudinaryURL = row.cover;
 
-            // Safety check
-            let fileId = null;
-
-            if (driveUrl.includes("/d/")) {
-                fileId = driveUrl.split("/d/")[1]?.split("/")[0];
-            }
-
-            // Agar link galat hai → error
-            if (!fileId) {
+            if (!cloudinaryURL) {
                 return res.status(400).json({
-                    message: `Invalid Google Drive URL for title: ${row.title}`
+                    message: `Cover URL missing for title: ${row.title}`
                 });
             }
 
-            // ---------------------------
-            // 2️⃣ Convert to Direct Link
-            // ---------------------------
-            const directUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
-            // ---------------------------
-            // 3️⃣ Upload to Cloudinary
-            // ---------------------------
-            const uploaded = await cloudinary.uploader.upload(directUrl, {
-                folder: "library"
-            });
-
-            // ---------------------------
-            // 4️⃣ Prepare Data for MySQL
-            // ---------------------------
+            // Prepare Data for MySQL
             values.push([
                 row.title || null,
                 row.standard || null,
                 row.description || null,
                 row.price || null,
-                uploaded.secure_url,  // Final Cloudinary URL
+                cloudinaryURL,   // ✔ directly insert Cloudinary URL
                 row.quantity || 0
             ]);
         }
 
-        // ---------------------------
-        // 5️⃣ Insert All Rows in Database
-        // ---------------------------
+        // Insert All Rows
         const insertQuery = `
             INSERT INTO librarybooks 
             (title, standard, description, price, cover, quantity)
@@ -719,6 +693,7 @@ app.post("/bulkupload", upload.single("file"), async (req, res) => {
         return res.status(500).json({ message: "Error processing file", error });
     }
 });
+
 
 
 
