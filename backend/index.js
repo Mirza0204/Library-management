@@ -468,7 +468,6 @@ app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
     try {
         const bookId = req.params.id;
 
-        // 1️⃣ Check ID valid or not
         if (!bookId) {
             return res.status(400).json({
                 success: false,
@@ -476,7 +475,6 @@ app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
             });
         }
 
-        // 2️⃣ Required fields validation
         if (!req.body.title || !req.body.standard || !req.body.price) {
             return res.status(400).json({
                 success: false,
@@ -484,56 +482,65 @@ app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
             });
         }
 
-        // 3️⃣ Check if new cover uploaded or use old cover from body
-        const coverPath = req.file ? req.file.path : req.body.cover;
-
-        const q = `
-            UPDATE librarybooks 
-            SET title=?, standard=?, description=?, price=?, cover=?, quantity=? 
-            WHERE id=?
-        `;
-
-        const values = [
-            req.body.title,
-            req.body.standard,
-            req.body.description || "",
-            req.body.price,
-            coverPath,
-            req.body.quantity || 0,
-            bookId
-        ];
-
-        db.query(q, values, (err, data) => {
+        // 1️⃣ First fetch old cover
+        db.query("SELECT cover FROM librarybooks WHERE id=?", [bookId], (err, result) => {
             if (err) {
-                console.log("SQL Update Error:", err);
-
-                // SQL format wrong / missing column → 400 Bad Request
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid update request or SQL error",
-                    error: err
-                });
+                return res.status(500).json({ success: false, message: "DB error", error: err });
             }
 
-            // 4️⃣ If no book found → 404
-            if (data.affectedRows === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Book not found"
-                });
+            if (result.length === 0) {
+                return res.status(404).json({ success: false, message: "Book not found" });
             }
 
-            // 5️⃣ Success → 200
-            return res.status(200).json({
-                success: true,
-                message: "Book updated successfully"
+            const oldCover = result[0].cover;
+
+            // 2️⃣ If new image uploaded → use new
+            //     if not uploaded → use old cover
+            const coverPath = req.file ? req.file.path : (req.body.cover || oldCover);
+
+            const q = `
+                UPDATE librarybooks 
+                SET title=?, standard=?, description=?, price=?, cover=?, quantity=? 
+                WHERE id=?
+            `;
+
+            const values = [
+                req.body.title,
+                req.body.standard,
+                req.body.description || "",
+                req.body.price,
+                coverPath,
+                req.body.quantity || 0,
+                bookId
+            ];
+
+            db.query(q, values, (err, data) => {
+                if (err) {
+                    console.log("SQL Update Error:", err);
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid update request or SQL error",
+                        error: err
+                    });
+                }
+
+                if (data.affectedRows === 0) {
+                    return res.status(404).json({
+                        success: false,
+                        message: "Book not found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: true,
+                    message: "Book updated successfully"
+                });
             });
         });
 
     } catch (error) {
         console.log("SERVER ERROR:", error);
 
-        // 6️⃣ 500 Internal Error
         return res.status(500).json({
             success: false,
             message: "Internal server error",
@@ -541,6 +548,7 @@ app.put("/librarybooks/:id", upload.single("cover"), (req, res) => {
         });
     }
 });
+
 
 
 //--------------- Update condition ---------------

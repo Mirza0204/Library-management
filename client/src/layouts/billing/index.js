@@ -243,10 +243,10 @@ function Billing() {
 
                 <select className="tables-input-child" value={bookLibrary.standard} onChange={handleChange} name='standard'>
                   <option value="">Select Standard</option>
-                  <option value="First" id="1">First</option>
-                  <option value="Second" id="2">Second</option>
-                  <option value="Third" id="3">Third</option>
-                  <option value="Fourth" id="4">Fourth</option>
+                  <option value="I" id="1">I</option>
+                  <option value="II" id="2">II</option>
+                  <option value="III" id="3">III</option>
+                  <option value="VI" id="4">VI</option>
                 </select>
 
                 {/* Quantity with +/- */}
