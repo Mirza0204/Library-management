@@ -42,10 +42,6 @@ function Bulkupload() {
     };
 
     const downloadDummyExcel = () => {
-        const link = document.createElement("a");
-        link.href = "/dummy_books_template.xlsx";
-        link.download = "dummy_books_template.xlsx";
-        link.click();
     };
 
     return (
