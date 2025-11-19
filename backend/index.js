@@ -316,18 +316,8 @@ const upload = multer({ storage });
 
 app.post("/librarybooks", upload.single("cover"), (req, res) => {
     try {
-        // --- 1️⃣ Validation ----
-        if (!req.body.title || !req.body.standard || !req.body.price) {
-            return res.status(400).json({
-                success: false,
-                message: "Required fields missing (title, standard, price)"
-            });
-        }
-
-        // --- 2️⃣ Cover Image Validation ----
         const coverUrl = req.file ? req.file.path : null;
 
-        // --- 3️⃣ SQL Query ----
         const q = `
             INSERT INTO librarybooks 
             (title, standard, description, price, cover, quantity)
@@ -343,44 +333,27 @@ app.post("/librarybooks", upload.single("cover"), (req, res) => {
             req.body.quantity || 0
         ];
 
-        db.query(q, [values], (err, data) => {
+        db.query(q, values, (err, data) => {
             if (err) {
-                console.error("SQL ERROR:", err);
-
-                // Incorrect format, wrong column etc ➡️ 400
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid data or SQL error",
-                    error: err
-                });
+                console.log("SQL ERROR:", err);
+                return res.status(400).json({ success: false, message: "SQL error", error: err });
             }
 
-            // --- 4️⃣ If insert fails for unknown reasons ----
-            if (!data.affectedRows) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Book not added, try again"
-                });
-            }
-
-            // --- 5️⃣ SUCCESS ----
             return res.status(201).json({
                 success: true,
                 message: "Book added successfully",
-                data: data
             });
         });
 
     } catch (error) {
-        console.error("SERVER ERROR:", error);
-
         return res.status(500).json({
             success: false,
             message: "Internal server error",
-            error: error
+            error,
         });
     }
 });
+
 
 
 // app.get("/librarybooks", (req, res) => {
