@@ -720,52 +720,6 @@ app.get("/bulkupload", (req, res) => {
 // ------------------------------------------------------------------
 
 // POST: create student with 3 books
-// app.post("/studentdata", (req, res) => {
-//     const q = `
-//     INSERT INTO studentdata
-//     (studentName, rollNo, divi, standard,
-//      bookName, quantity,
-//      bookName2, quantity2,
-//      bookName3, quantity3,
-//      currentDate, lastDate, status)
-//     VALUES (?)
-//   `;
-
-//     const formatDate = (d) => (d ? d.split("T")[0] : null);
-
-//     const values = [
-//         req.body.studentName || null,
-//         req.body.rollNo || null,
-//         req.body.divi || null,
-//         req.body.standard || null,
-
-//         // book 1
-//         req.body.bookName || null,
-//         Number(req.body.quantity) || 0,
-
-//         // book 2
-//         req.body.bookName2 || null,
-//         Number(req.body.quantity2) || 0,
-
-//         // book 3
-//         req.body.bookName3 || null,
-//         Number(req.body.quantity3) || 0,
-
-//         formatDate(req.body.currentDate),
-//         formatDate(req.body.lastDate),
-//         req.body.status || "Pending",
-//     ];
-
-//     db.query(q, [values], (err, data) => {
-//         if (err) {
-//             console.error("Insert error:", err);
-//             return res.status(500).json({ error: err });
-//         }
-
-//         return res.json({ success: true, insertedId: data.insertId });
-//     });
-// });
-
 app.post("/studentdata", (req, res) => {
     const q = `
     INSERT INTO studentdata
@@ -775,56 +729,31 @@ app.post("/studentdata", (req, res) => {
      bookName3, quantity3,
      currentDate, lastDate, status)
     VALUES (?)
-    `;
+  `;
 
     const formatDate = (d) => (d ? d.split("T")[0] : null);
-
-    // QUANTITIES
-    const qty1 = Number(req.body.quantity) || 0;
-    const qty2 = Number(req.body.quantity2) || 0;
-    const qty3 = Number(req.body.quantity3) || 0;
-
-    const totalBooks = qty1 + qty2 + qty3;
-    const status = req.body.status;
-
-    // -----------------------------
-    // ⭐ VALIDATION RULES
-    // -----------------------------
-
-    // Rule 1: Student has books → cannot mark 'Received'
-    if (totalBooks > 0 && status === "Received") {
-        return res.status(400).json({
-            error: true,
-            message: "Status cannot be 'Received' because student still has books."
-        });
-    }
-
-    // Rule 2: Student has NO books → cannot mark 'Pending'
-    if (totalBooks === 0 && status === "Pending") {
-        return res.status(400).json({
-            error: true,
-            message: "Status cannot be 'Pending' when student has no books."
-        });
-    }
-
-    // -----------------------------
-    // END VALIDATION
-    // -----------------------------
 
     const values = [
         req.body.studentName || null,
         req.body.rollNo || null,
         req.body.divi || null,
         req.body.standard || null,
+
+        // book 1
         req.body.bookName || null,
-        qty1,
+        Number(req.body.quantity) || 0,
+
+        // book 2
         req.body.bookName2 || null,
-        qty2,
+        Number(req.body.quantity2) || 0,
+
+        // book 3
         req.body.bookName3 || null,
-        qty3,
+        Number(req.body.quantity3) || 0,
+
         formatDate(req.body.currentDate),
         formatDate(req.body.lastDate),
-        status
+        req.body.status || "Pending",
     ];
 
     db.query(q, [values], (err, data) => {
@@ -851,29 +780,52 @@ app.get("/studentdata", (req, res) => {
 
 //--------------- Update condition ---------------
 // app.put("/studentdata/:id", (req, res) => {
-//     // this params represent /books
-//     const bookId = req.params.id;
-//     // const q = "UPDATE books SET `title` = ? ,`desc` = ?, `price` = ?, `cover` = ? WHERE id = ?"
-//     const q = "UPDATE studentdata SET `studentName`=?, `rollNo`=?, `divi`=?, `standard`=?, `bookName`=?, quantity=?, `status`=? , `currentDate`=?, `lastDate`=?   WHERE id=?"
+//     const id = req.params.id;
 
+//     const q = `
+//     UPDATE studentdata SET
+//       studentName=?, rollNo=?, divi=?, standard=?,
+//       bookName=?, quantity=?,
+//       bookName2=?, quantity2=?,
+//       bookName3=?, quantity3=?,
+//       status=?, currentDate=?, lastDate=?
+//     WHERE id=?
+//   `;
+
+//     const formatDate = (d) => (d ? d.split("T")[0] : null);
 
 //     const values = [
-//         req.body.studentName,
-//         req.body.rollNo,
-//         req.body.divi, // we are reading "div" from frontend
-//         req.body.standard,
-//         req.body.bookName,
-//         req.body.quantity,
-//         req.body.status, // Added
-//         req.body.currentDate,
-//         req.body.lastDate,
-//     ]
+//         req.body.studentName || null,
+//         req.body.rollNo || null,
+//         req.body.divi || null,
+//         req.body.standard || null,
 
-//     db.query(q, [...values, bookId], (err, data) => {
-//         if (err) return res.json(err)
-//         return res.json("librarybooks has been Updated Succesfully")
-//     })
-// })
+//         req.body.bookName || null,
+//         Number(req.body.quantity) || 0,
+
+//         req.body.bookName2 || null,
+//         Number(req.body.quantity2) || 0,
+
+//         req.body.bookName3 || null,
+//         Number(req.body.quantity3) || 0,
+
+//         req.body.status || "Pending",
+//         formatDate(req.body.currentDate),
+//         formatDate(req.body.lastDate),
+
+//         id,
+//     ];
+
+//     db.query(q, values, (err, data) => {
+//         if (err) {
+//             console.error("Update error:", err);
+//             return res.status(500).json(err);
+//         }
+
+//         return res.json({ success: true, message: "studentdata updated" });
+//     });
+// });
+
 
 app.put("/studentdata/:id", (req, res) => {
     const id = req.params.id;
@@ -886,9 +838,40 @@ app.put("/studentdata/:id", (req, res) => {
       bookName3=?, quantity3=?,
       status=?, currentDate=?, lastDate=?
     WHERE id=?
-  `;
+    `;
 
     const formatDate = (d) => (d ? d.split("T")[0] : null);
+
+    // -----------------------------
+    // ⭐ VALIDATION RULES
+    // -----------------------------
+
+    const qty1 = Number(req.body.quantity) || 0;
+    const qty2 = Number(req.body.quantity2) || 0;
+    const qty3 = Number(req.body.quantity3) || 0;
+
+    const totalBooks = qty1 + qty2 + qty3;
+    const status = req.body.status;
+
+    // Rule 1: Student has books → cannot mark 'Received'
+    if (totalBooks > 0 && status === "Received") {
+        return res.status(400).json({
+            error: true,
+            message: "Status cannot be 'Received' because student still has books."
+        });
+    }
+
+    // Rule 2: Student has NO books → cannot mark 'Pending'
+    if (totalBooks === 0 && status === "Pending") {
+        return res.status(400).json({
+            error: true,
+            message: "Status cannot be 'Pending' when student has no books."
+        });
+    }
+
+    // -----------------------------
+    // END VALIDATION
+    // -----------------------------
 
     const values = [
         req.body.studentName || null,
@@ -897,15 +880,15 @@ app.put("/studentdata/:id", (req, res) => {
         req.body.standard || null,
 
         req.body.bookName || null,
-        Number(req.body.quantity) || 0,
+        qty1,
 
         req.body.bookName2 || null,
-        Number(req.body.quantity2) || 0,
+        qty2,
 
         req.body.bookName3 || null,
-        Number(req.body.quantity3) || 0,
+        qty3,
 
-        req.body.status || "Pending",
+        status,
         formatDate(req.body.currentDate),
         formatDate(req.body.lastDate),
 
@@ -921,6 +904,7 @@ app.put("/studentdata/:id", (req, res) => {
         return res.json({ success: true, message: "studentdata updated" });
     });
 });
+
 
 //--------------- Update condition ---------------
 
