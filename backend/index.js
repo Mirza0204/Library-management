@@ -150,36 +150,6 @@ app.put("/books/:id", (req, res) => {
 // -----------------------------------------------------------
 
 // ✅ LOGIN (Sign In)
-// app.post("/signinlibrary", (req, res) => {
-//     const { username, password } = req.body;
-
-//     if (!username || !password) {
-//         return res.status(400).json({ message: "Username and password required!" });
-//     }
-
-//     // ✅ Use your actual table name 'signinlibrary'
-//     const q = "SELECT * FROM signinlibrary WHERE username = ? AND password = ?";
-
-//     db.query(q, [username, password], (err, results) => {
-//         if (err) {
-//             console.error("❌ Login Error:", err);
-//             return res.status(500).json({ message: "Database error", error: err });
-//         }
-
-//         if (results.length > 0) {
-//             console.log("✅ User logged in:", username);
-//             return res.json({
-//                 success: true,
-//                 message: "Login successful!",
-//                 redirectUrl: "http://localhost:3000/dashboard",
-//             });
-//         } else {
-//             return res
-//                 .status(401)
-//                 .json({ success: false, message: "Invalid credentials!" });
-//         }
-//     });
-// });
 
 app.post("/signinlibrary", (req, res) => {
     const { username, password } = req.body;
